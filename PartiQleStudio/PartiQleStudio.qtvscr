@@ -1,0 +1,357 @@
+<FlowDocument xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" FontFamily="Segoe UI" FontSize="12">
+  <FlowDocument.Tag><![CDATA[{
+  "timestamp": "2025-11-07 09:52:37",
+  "files": {
+    "C:\\Users\\bapti\\Documents\\IPSA\\A5_TIE\\IN518_Haute_Performance_GPU\\CudaDemo\\CudaDemo\\CudaDemo.vcxproj": {
+      "before": "3Vhtb9s2EO7nAfu0PyAICWJ/sOWXtElnWUUiO4Ex5wVx0mCAgYCWaJuLJAoklcZd9+v2x3aUqFfbCbyuBdYCDWTe8UQ+d/fcnf7+5c0b88Oz72lPmHFCg77ebrZ0DQcOdUmw6OuRmDeO9Q/Wzz+Z14z+gR2hDfAcRZ64RWyBBe/rpxHxXF27pdTjHzMzb6UdsByAxlKI8FfD4M4S+4g3feIwyulcNB3qGy5+wh4NMTN8PpOmjE6r1dXhjZpmjgT2zxmNQm2MZtjr6+oQNg3mZBExJODQPFEG9U1SbRQ4XuTivj7As2jx5fndYaoPO0qGrFjDNMqL8iDyn3ntITGnzLfAhGlkvxI5LCT4bNr8ysFusIcRxy8eTen854czjQzjBHK4BjhDrEqwn3t0hrw1oM8j4lp/vj8+e98+6p41uu1uq3F01h02Wu3TbuOoe9w97AyHR/bbo78yfOI9CrMbSsUl8jEPkYMtO3LRAPvUNMrrcSRIePNzqejwQ8qEpoDv63u1j7YKy2sklvXpRRZpdhg2VeA2Q7DEdc3YdF/wnktkUPX1g71ayZf1L3u11On1g37/IIunAz0Nz9KGNMzKQXa7CrF1EoYeceLorXg0Fit47jiO3zEmM4YYwdwSLMKmsb6uNthLxJAjMJtgYV1AkpLTlYANpXWlm14lzltQf2ofdvOoTle3Yl9yh7YLbIVo/37AzSF6X0Lufkk9DHdaMORfhYL45HPsHYX4VvH3B360W9CXgz3ZXErt4bPAgeR+iBkBnJ8n+atvipnfjrigKVx8at8NTrR2t9mqpJlReHUxe0tnSYNqssRQWvSdwqqQjbF9WT3WoILMYZJcBoRV2aGQ3M0I1NLzF0IbPxMueA2IYWc7B/WMI8bUQR4QwAAJlCZhxkbfHKZS9v1QQKXBU4oo6agLJPuNDOKyXsG9uxB+ityYBI/QYDDs40AgT9FFdTWl3GgGrK/6EQhB6KZoTOtKbly/oqC2yuJmyWL3UFio9/Zq9yRw6Sc+GfxWldyc/D4enT7I7KxDyU9aotjOVoaXfQGUTBLE9TBB9SvRsj2b+iHxsIIPcvQesQBYZyy7QCv+C1WotJiAA6olXh4QjmYedk2jtJwpXzMM1OdgzinLb8Gt+9Flt9ODv+8Oew+D4endee/BvrqcXI2Hvf3all0A2RZJGgdG9WqmjIH8muc4wNCtJvV8FMg2slhftoqz+0yi2WTFwSUW+IBDsTKNfCnTOnGT7gV5AxziwIVGXrYNDK08MmvC/94nEvh+/ORAu8XEAxdwECdeecQswF63E/+QHKgeFy5RT7Cbh9DoJwao73oLJUHuEwpTNb7EXmoHjqpU4AlFQv2IoHWMrVB35qQK8OiE6sd+bfNlwBebBTnYuTzpnFbFXCvaXRfLLJJ9qOx/HokABVkqYLGYQNNmcwrBJachPv046bQ6nWk8ukwToKczEkxhSJhmTfuLJ0q8ZxqFiDHlGdZyJeltgc6WJMBp6bDkMLJZkoWFynfgjOI1IN6VIKeETSDKBIOYsxoNkvBGIwQC0vT9grF9XSsCq7aUfJWaSa9bvWIyieS5GjNOfJ54DKwIduoNNha9asZ+BRldoOdJiLeT0VkUOBLDmN+km4HxVKnYKCo4TjBIOeKkaukIMArWBNmmbVRVpL7L/xH1DQPJ9PbVxeDk9ox68sOEAm+TJINB1QV8g+eYARFm49MGQbYp59R/QbM/KKN+M2aCwbRCc69wQE4JkKyFvfk3nqSENZ0oa/eq3zfWh4IXPxqI5DNXZq4wxqRDfzZBqW8P2dz/6qteHqCqr67MBtkXFesf",
+      "after": "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"
+    }
+  }
+}]]></FlowDocument.Tag>
+  <Section Margin="0,24" TextAlignment="Center">
+    <Paragraph FontSize="24" FontWeight="Bold" Margin="12,0">
+      <LineBreak />
+      <Span Foreground="Gray">Qt Visual Studio Tools</Span>
+    </Paragraph>
+    <Paragraph FontSize="42" Margin="12,0" FontWeight="Bold">
+      <Span TextDecorations="Underline">Project Format Conversion</Span>
+    </Paragraph>
+    <Paragraph Margin="12,8" FontSize="18">
+      <Span>Report generated on 2025-11-07 09:52:37</Span>
+    </Paragraph>
+  </Section>
+  <Section>
+    <Paragraph FontSize="32" FontWeight="Bold" Margin="12,0">
+      <Span>Files</Span>
+    </Paragraph>
+    <Paragraph Margin="24,12,0,0">
+      <Span FontFamily="Consolas" FontSize="14" Background="WhiteSmoke"><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+      <LineBreak />
+      <Hyperlink NavigateUri="file://C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj?before">[Before]</Hyperlink>
+      <Hyperlink NavigateUri="file://C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj?after">[After]</Hyperlink>
+      <Hyperlink NavigateUri="file://C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj?diff&amp;before&amp;after">
+                        [Diff before/after]
+                    </Hyperlink>
+      <Hyperlink NavigateUri="file://C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj?diff&amp;before&amp;current">
+                        [Diff before/current]
+                    </Hyperlink>
+      <Hyperlink NavigateUri="file://C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj?diff&amp;after&amp;current">
+                        [Diff after/current]
+                    </Hyperlink>
+      <LineBreak />
+    </Paragraph>
+  </Section>
+  <Section>
+    <Paragraph FontSize="32" FontWeight="Bold" Margin="12,0">
+      <Span>Changes</Span>
+    </Paragraph>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Enabling multi-processor compilation]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[      <MultiProcessorCompilation>true</MultiProcessorCompilation>]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[      <MultiProcessorCompilation>true</MultiProcessorCompilation>]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Project format version]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[    <Keyword>QtVS_v304</Keyword>]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Fallback for QTMSBUILD environment variable]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Default Qt properties]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  <Import Project="$(QtMsBuild)\qt_defaults.props" Condition="Exists('$(QtMsBuild)\qt_defaults.props')" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Qt build settings]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Warn if Qt/MSBuild is not found]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') OR !Exists('$(QtMsBuild)\Qt.props')">]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  </Target>]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Qt property sheet]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[    <Import Project="$(QtMsBuild)\Qt.props" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[    <Import Project="$(QtMsBuild)\Qt.props" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+    <Paragraph FontSize="20" FontWeight="Bold" Margin="12">
+      <Span><![CDATA[🡺 Qt targets]]></Span>
+    </Paragraph>
+    <Table CellSpacing="0" BorderBrush="Gray" BorderThickness="0.5">
+      <Table.Columns>
+        <TableColumn />
+        <TableColumn />
+      </Table.Columns>
+      <TableRowGroup>
+        <TableRow Background="Orange">
+          <TableCell ColumnSpan="2" BorderThickness="0.5" BorderBrush="Gray">
+            <Paragraph Margin="10,5" FontWeight="Bold">
+              <Span><![CDATA[C:\Users\bapti\Documents\IPSA\A5_TIE\IN518_Haute_Performance_GPU\CudaDemo\CudaDemo\CudaDemo.vcxproj]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell ColumnSpan="2" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="0.5" />
+        </TableRow>
+        <TableRow>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0" />
+          </TableCell>
+          <TableCell BorderThickness="0, 0, 0.5, 0" BorderBrush="Gray">
+            <Paragraph FontFamily="Consolas" Margin="4, 0">
+              <Span Background="LightGreen"><![CDATA[  <Import Project="$(QtMsBuild)\qt.targets" Condition="Exists('$(QtMsBuild)\qt.targets')" />]]></Span>
+            </Paragraph>
+          </TableCell>
+        </TableRow>
+      </TableRowGroup>
+    </Table>
+  </Section>
+  <Section>
+    <Paragraph />
+  </Section>
+</FlowDocument>
+<!--39geU5l4XTb45PI6qK9RVIV1+Oz4tEM6H7baPy5IxY8=-->
