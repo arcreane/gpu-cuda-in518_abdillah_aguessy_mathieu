@@ -25,6 +25,20 @@
     <item>
      <widget class="QWidget" name="raylibPlaceholder" native="true"/>
     </item>
+    <item>
+     <widget class="QWidget" name="renderWidget">
+      <property name="sizePolicy"><sizepolicy hsizetype="Expanding" vsizetype="Expanding"/></property>
+      <property name="minimumSize"><size><width>100</width><height>100</height></size></property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="controlPanel">
+      <property name="sizePolicy"><sizepolicy hsizetype="Fixed" vsizetype="Expanding"/></property>
+      <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
+      <property name="maximumSize"><size><width>300</width><height>16777215</height></size></property>
+      <layout class="QVBoxLayout" name="verticalLayoutControl"/>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
