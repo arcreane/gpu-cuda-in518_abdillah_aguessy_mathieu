@@ -29,7 +29,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btnRunCuda_clicked()
 {
-	// parametres CUDA
+#ifdef USE_CUDA
+    // ==========
+    // VERSION AVEC CUDA
+    // ==========
     const int grid = 3;
     const int block = 4;
     const int size = grid * block;
@@ -57,5 +60,17 @@ void MainWindow::on_btnRunCuda_clicked()
 
     qDebug().noquote() << msg;
     QMessageBox::information(this, "CUDA dump", msg);
+
+#else
+    // ==========
+    // VERSION SANS CUDA
+    // ==========
+    QMessageBox::warning(
+        this,
+        "CUDA non disponible",
+        "Votre machine ne possède pas CUDA.\n"
+        "Le calcul GPU n'a pas été exécuté."
+    );
+#endif
 }
 
