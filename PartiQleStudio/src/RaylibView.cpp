@@ -7,6 +7,15 @@
 // Qt
 #include <QResizeEvent>
 #include <QWindow>
+#include <cmath>
+
+
+static float frand(float minVal, float maxVal) {
+    int r = GetRandomValue(0, 10000);
+    float t = r / 10000.0f;
+    return minVal + (maxVal - minVal) * t;
+}
+
 
 RaylibView::RaylibView(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_NativeWindow, false);
@@ -28,6 +37,69 @@ void RaylibView::resizeEvent(QResizeEvent* ev) {
     reqH = ev->size().height();
 }
 
+/* PARICULES - Methods */
+void RaylibView::initParticles(int count, int width, int height) {
+    particles_.clear();
+    particles_.reserve(count);
+
+    for (int i = 0; i < count; ++i) {
+        CpuParticle p;
+        p.radius = frand(3.0f, 6.0f);
+
+        p.x = frand(p.radius, width - p.radius);
+        p.y = frand(p.radius, height - p.radius);
+
+        // v init légère et vers le haut
+        p.vx = frand(-50.0f, 50.0f);
+        p.vy = frand(-80.0f, -20.0f);
+
+        p.r = (unsigned char)(100 + (i * 13) % 155);
+        p.g = (unsigned char)(100 + (i * 29) % 155);
+        p.b = (unsigned char)(180 + (i * 7) % 75);
+        p.a = 255;
+
+        particles_.push_back(p);
+    }
+}
+
+void RaylibView::updateParticlesCPU(float dt, int width, int height) {
+    for (auto& p : particles_) {
+        // gravite
+        p.vy += gravity_ * dt;
+
+        // frottement global
+        p.vx *= damping_;
+        p.vy *= damping_;
+
+        // integration
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        float r = p.radius;
+
+        // collision horizontale
+        if (p.x < r) {
+            p.x = r;
+            p.vx = -p.vx * 0.8f; // rebond amorti
+        }
+        else if (p.x > width - r) {
+            p.x = width - r;
+            p.vx = -p.vx * 0.8f;
+        }
+
+        // collision verticale
+        if (p.y < r) {
+            p.y = r;
+            p.vy = -p.vy * 0.8f;
+        }
+        else if (p.y > height - r) {
+            p.y = height - r;
+            p.vy = -p.vy * 0.8f;
+        }
+    }
+}
+
+
 void RaylibView::startRaylibThread() {
     if (running) return;
     running = true;
@@ -43,12 +115,12 @@ void RaylibView::startRaylibThread() {
         int W = reqW.load(), H = reqH.load();
         if (W <= 0) W = 800; if (H <= 0) H = 450;
 
-        // Optionnel : fenetre sans bordure si voulu
-        // SetConfigFlags(FLAG_WINDOW_UNDECORATED);
-
         // 1) Creer la fenetre Raylib
-        InitWindow(W, H, "Raylib embedded in Qt");
+        InitWindow(W, H, "PartiQle Studio - CPU Particles");
         SetTargetFPS(60);
+
+		// Initialiser les particules
+        initParticles(600, W, H);
 
         // 2) Recuperer le handle natif et le transmettre a Qt
         void* native = GetWindowHandle();
@@ -65,10 +137,25 @@ void RaylibView::startRaylibThread() {
                 }
             }
 
+            int cw = curW.load();
+            int ch = curH.load();
+
+			int simW = (cw > 0 ? cw : W);
+            int simH = (ch > 0 ? ch : H);
+			float dt = GetFrameTime();
+			updateParticlesCPU(dt, simW, simH);
+
             BeginDrawing();
             Color bg = { (unsigned char)clrR.load(), (unsigned char)clrG.load(), (unsigned char)clrB.load(), 255 };
             ClearBackground(bg);
 
+			// Dessiner les particules
+            for (const auto& p : particles_) {
+                Vector2 pos{ p.x, p.y };
+                Color   col{ p.r, p.g, p.b, p.a };
+                DrawCircleV(pos, p.radius, col);
+
+            }
             // Exemple minimal de drawing (remarque : DrawText utilise la police par defaut)
             DrawText("Raylib inside Qt", 10, 10, 20, MAROON);
 

@@ -5,6 +5,14 @@
 #include <atomic>
 #include <thread>
 #include <future>
+#include <vector>
+
+struct CpuParticle {
+    float x, y;
+    float vx, vy;
+	float radius;
+	unsigned char r, g, b, a;
+};
 
 class RaylibView : public QWidget {
     Q_OBJECT
@@ -23,6 +31,9 @@ private:
     void stopRaylibThread();
     void embedHandleToQt(void* nativeHandle);
 
+	void initParticles(int count, int width, int height);
+	void updateParticlesCPU(float dt, int width, int height);
+
 private:
     std::thread         rlThread;
     std::atomic<bool>   running{ false };
@@ -36,4 +47,8 @@ private:
 
     QWidget* containerWidget{ nullptr };
     QWindow* foreignWin{ nullptr };
+
+	std::vector<CpuParticle> particles_;
+    float gravity_ = 400.0f;
+    float damping_ = 0.999f;
 };
