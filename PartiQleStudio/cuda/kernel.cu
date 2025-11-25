@@ -66,13 +66,13 @@ extern "C" void cuda_demo_dump(
 // --------------------------------------------------
 // Buffer global particules
 // --------------------------------------------------
-static ParticleGPU* d_particles = nullptr;
+static Particle* d_particles = nullptr;
 static int          d_capacity = 0;
 
 // --------------------------------------------------
 // Kernel d'update particules
 // --------------------------------------------------
-__global__ void kernel_update_particles(ParticleGPU* p,
+__global__ void kernel_update_particles(Particle* p,
     int count,
     float dt,
     float gravityY,
@@ -82,7 +82,7 @@ __global__ void kernel_update_particles(ParticleGPU* p,
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= count) return;
 
-    ParticleGPU& part = p[i];
+    Particle& part = p[i];
 
     // gravité
     part.vy += gravityY * dt;
@@ -110,6 +110,10 @@ __global__ void kernel_update_particles(ParticleGPU* p,
         part.vx = 20.0f * ((i % 10) - 5);
         part.vy = -200.0f;
         part.life = 5.0f;
+        part.r = 200 + (i % 50);
+        part.g = 100 + (i % 100);
+        part.b = 150;
+        part.a = 255;
     }
 }
 
@@ -120,12 +124,11 @@ extern "C" void cuda_particles_init(int maxCount)
 {
     if (d_particles) {
         CUDA_CHECK(cudaFree(d_particles));
-        d_particles = nullptr;
-        d_capacity = 0;
     }
     d_capacity = maxCount;
+
     CUDA_CHECK(cudaMalloc((void**)&d_particles,
-        d_capacity * sizeof(ParticleGPU)));
+        d_capacity * sizeof(Particle)));
 }
 
 extern "C" void cuda_particles_free()
@@ -137,13 +140,13 @@ extern "C" void cuda_particles_free()
     }
 }
 
-extern "C" void cuda_particles_upload(const ParticleGPU* hostParticles,
+extern "C" void cuda_particles_upload(const Particle* hostParticles,
     int count)
 {
     if (!d_particles || count > d_capacity) return;
     CUDA_CHECK(cudaMemcpy(d_particles,
         hostParticles,
-        count * sizeof(ParticleGPU),
+        count * sizeof(Particle),
         cudaMemcpyHostToDevice));
 }
 
@@ -164,13 +167,13 @@ extern "C" void cuda_particles_step(float dt,
     CUDA_CHECK(cudaDeviceSynchronize());
 }
 
-extern "C" void cuda_particles_download(ParticleGPU* hostParticles,
+extern "C" void cuda_particles_download(Particle* hostParticles,
     int count)
 {
     if (!d_particles || count > d_capacity) return;
 
     CUDA_CHECK(cudaMemcpy(hostParticles,
         d_particles,
-        count * sizeof(ParticleGPU),
+        count * sizeof(Particle),
         cudaMemcpyDeviceToHost));
 }

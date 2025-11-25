@@ -7,12 +7,7 @@
 #include <future>
 #include <vector>
 
-struct CpuParticle {
-    float x, y;
-    float vx, vy;
-	float radius;
-	unsigned char r, g, b, a;
-};
+#include "cuda_api.h" //pour le define de Particle
 
 class RaylibView : public QWidget {
     Q_OBJECT
@@ -23,6 +18,9 @@ public:
     // Exemple d’API pour piloter la couleur de fond si besoin
     void setClearColor(unsigned char r, unsigned char g, unsigned char b); //rgb
 
+    void setUseGPU(bool enabled);
+    bool isUsingGPU() const { return useGPU.load(); }
+
 protected:
     void resizeEvent(QResizeEvent* event) override;
 
@@ -31,8 +29,9 @@ private:
     void stopRaylibThread();
     void embedHandleToQt(void* nativeHandle);
 
-	void initParticles(int count, int width, int height);
-	void updateParticlesCPU(float dt, int width, int height);
+    void initParticlesCPU();
+    void stepParticlesCPU(float dt);
+    void stepParticlesGPU(float dt);
 
 private:
     std::thread         rlThread;
@@ -42,13 +41,23 @@ private:
     std::atomic<int>    reqW{ 800 }, reqH{ 450 };
     std::atomic<int>    curW{ 0 }, curH{ 0 };
 
-    // Couleur de fond (RAYWHITE par défaut)
-    std::atomic<int>    clrR{ 245 }, clrG{ 245 }, clrB{ 245 };
+    // Couleur de fond
+    std::atomic<int>    clrR{ 20 }, clrG{ 20 }, clrB{ 40 };
 
     QWidget* containerWidget{ nullptr };
     QWindow* foreignWin{ nullptr };
 
-	std::vector<CpuParticle> particles_;
-    float gravity_ = 400.0f;
-    float damping_ = 0.999f;
+    // particle simulation
+    std::vector<Particle> particles;
+    int   maxParticles = 10000;
+    float gravityY = 300.0f;
+    float damping = 0.99f;
+    float groundY = 420.0f;
+
+	std::atomic<bool>   useGPU{ false };
+
+#ifdef USE_CUDA
+	bool cudaInitialized = false;
+#endif
+
 };
