@@ -67,17 +67,19 @@ extern "C" void cuda_demo_dump(
 // Buffer global particules
 // --------------------------------------------------
 static Particle* d_particles = nullptr;
-static int          d_capacity = 0;
+static int       d_capacity = 0;
 
 // --------------------------------------------------
 // Kernel d'update particules
 // --------------------------------------------------
-__global__ void kernel_update_particles(Particle* p,
-    int count,
-    float dt,
-    float gravityY,
-    float damping,
-    float groundY)
+__global__ void kernel_update_particles(
+    Particle* p,
+    int     count,
+    float   dt,
+    float   gravityY,
+    float   damping,
+    int     screenW,
+    int     screenH)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= count) return;
@@ -95,25 +97,27 @@ __global__ void kernel_update_particles(Particle* p,
     part.x += part.vx * dt;
     part.y += part.vy * dt;
 
-    // rebond au sol
-    if (part.y > groundY) {
-        part.y = groundY;
-        part.vy *= -0.5f; // rebond amorti
+    float r = part.radius;
+    const float bounce = 0.8f;
+
+    // collision horizontale
+    if (part.x < r) {
+        part.x = r;
+        part.vx = -part.vx * bounce;
+    }
+    else if (part.x > screenW - r) {
+        part.x = screenW - r;
+        part.vx = -part.vx * bounce;
     }
 
-    // décrément de "vie"
-    part.life -= dt;
-    if (part.life < 0.0f) {
-        // simple "respawn" en haut
-        part.x = 0.0f;
-        part.y = 0.0f;
-        part.vx = 20.0f * ((i % 10) - 5);
-        part.vy = -200.0f;
-        part.life = 5.0f;
-        part.r = 200 + (i % 50);
-        part.g = 100 + (i % 100);
-        part.b = 150;
-        part.a = 255;
+    // collision verticale
+    if (part.y < r) {
+        part.y = r;
+        part.vy = -part.vy * bounce;
+    }
+    else if (part.y > screenH - r) {
+        part.y = screenH - r;
+        part.vy = -part.vy * bounce;
     }
 }
 
@@ -124,11 +128,15 @@ extern "C" void cuda_particles_init(int maxCount)
 {
     if (d_particles) {
         CUDA_CHECK(cudaFree(d_particles));
+        d_particles = nullptr;
+        d_capacity = 0;
     }
-    d_capacity = maxCount;
 
-    CUDA_CHECK(cudaMalloc((void**)&d_particles,
-        d_capacity * sizeof(Particle)));
+    d_capacity = maxCount;
+    if (d_capacity > 0) {
+        CUDA_CHECK(cudaMalloc((void**)&d_particles,
+            d_capacity * sizeof(Particle)));
+    }
 }
 
 extern "C" void cuda_particles_free()
@@ -143,7 +151,8 @@ extern "C" void cuda_particles_free()
 extern "C" void cuda_particles_upload(const Particle* hostParticles,
     int count)
 {
-    if (!d_particles || count > d_capacity) return;
+    if (!d_particles || count <= 0 || count > d_capacity) return;
+
     CUDA_CHECK(cudaMemcpy(d_particles,
         hostParticles,
         count * sizeof(Particle),
@@ -153,7 +162,8 @@ extern "C" void cuda_particles_upload(const Particle* hostParticles,
 extern "C" void cuda_particles_step(float dt,
     float gravityY,
     float damping,
-    float groundY,
+    int   screenW,
+    int   screenH,
     int   count)
 {
     if (!d_particles || count <= 0) return;
@@ -161,16 +171,19 @@ extern "C" void cuda_particles_step(float dt,
     int blockSize = 256;
     int gridSize = (count + blockSize - 1) / blockSize;
 
-    kernel_update_particles << <gridSize, blockSize >> > (
-        d_particles, count, dt, gravityY, damping, groundY
+    kernel_update_particles <<<gridSize, blockSize>>> (
+        d_particles, count, dt,
+        gravityY, damping,
+        screenW, screenH
         );
+
     CUDA_CHECK(cudaDeviceSynchronize());
 }
 
 extern "C" void cuda_particles_download(Particle* hostParticles,
-    int count)
+    int       count)
 {
-    if (!d_particles || count > d_capacity) return;
+    if (!d_particles || count <= 0 || count > d_capacity) return;
 
     CUDA_CHECK(cudaMemcpy(hostParticles,
         d_particles,

@@ -3,6 +3,7 @@
 #include "cuda_api.h"
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QDebug>
 #include <vector>
 
@@ -22,6 +23,15 @@ MainWindow::MainWindow(QWidget *parent)
         lay->setContentsMargins(0, 0, 0, 0);
         lay->addWidget(rlView);
     }
+
+#ifdef USE_CUDA
+    // Raccourci clavier "G" pour basculer CPU <-> GPU
+    auto* toggleGpuShortcut = new QShortcut(QKeySequence(Qt::Key_G), this);
+    connect(toggleGpuShortcut, &QShortcut::activated, this, [this]() {
+        bool now = !rlView->isUsingGPU();
+        rlView->setUseGPU(now);
+        });
+#endif
 }
 
 MainWindow::~MainWindow()

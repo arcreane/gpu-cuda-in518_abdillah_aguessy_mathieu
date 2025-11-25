@@ -42,7 +42,7 @@ private:
     std::atomic<int>    curW{ 0 }, curH{ 0 };
 
     // Couleur de fond
-    std::atomic<int>    clrR{ 20 }, clrG{ 20 }, clrB{ 40 };
+    std::atomic<int>    clrR{ 245 }, clrG{ 245 }, clrB{ 245 };
 
     QWidget* containerWidget{ nullptr };
     QWindow* foreignWin{ nullptr };
@@ -50,9 +50,8 @@ private:
     // particle simulation
     std::vector<Particle> particles;
     int   maxParticles = 10000;
-    float gravityY = 300.0f;
-    float damping = 0.99f;
-    float groundY = 420.0f;
+    float gravityY = 0.1f;
+    float damping = 0.999f;
 
 	std::atomic<bool>   useGPU{ false };
 

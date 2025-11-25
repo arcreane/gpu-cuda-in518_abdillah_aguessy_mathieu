@@ -6,10 +6,14 @@
 // Qt
 #include <QResizeEvent>
 #include <QWindow>
+
 #include <algorithm>
+#include <chrono>
+#include <cstdlib>
 
-
-
+static float frand(float a, float b) {
+    return a + (b - a) * (float)rand() / (float)RAND_MAX;
+}
 
 RaylibView::RaylibView(QWidget* parent) : QWidget(parent) {
     setAttribute(Qt::WA_NativeWindow, false);
@@ -42,29 +46,40 @@ void RaylibView::resizeEvent(QResizeEvent* ev) {
     reqH.store(ev->size().height());
 }
 
-/* PARICULES - Methods */
+/* PARICULES CPU - Methods */
 void RaylibView::initParticlesCPU() {
     particles.clear();
     particles.reserve(maxParticles);
+
+    int width = curW.load();
+    int height = curH.load();
+    if (width <= 0)  width = 800;
+    if (height <= 0) height = 450;
 
     int count = maxParticles;
 
     for (int i = 0; i < count; ++i) {
         Particle p;
 
-        // spawn near the top center
-        p.x    = 100.0f + static_cast<float>(i % 50) * 5.0f;
-        p.y    = 50.0f + static_cast<float>((i / 50) % 10) * 5.0f;
-        p.vx   = 30.0f * static_cast<float>((i % 10) - 5);
-        p.vy   = -200.0f - static_cast<float>(i % 60);
-        p.life = 3.0f + 0.01f * static_cast<float>(i);
+        p.radius = frand(3.0f, 6.0f);
 
-        p.radius = 3.0f + static_cast<float>(i % 3);
+        // spawn near the top center
+        p.x = frand(p.radius, width - p.radius);
+        p.y = frand(p.radius, height - p.radius);
+        
+        // v init légère et vers le haut
+        /*p.vx = frand(-50.0f, 50.0f);
+        p.vy = frand(-80.0f, -20.0f);*/
+        p.vx = frand(-15.0f, 15.0f);
+        p.vy = frand(-15.0f, 15.0f);
+
+        p.life = 1.0f;
+
 
         // simple color gradient
-        p.r = static_cast<unsigned char>(150 + (i % 100));
-        p.g = static_cast<unsigned char>(100 + (i % 120));
-        p.b = static_cast<unsigned char>(200);
+        p.r = (unsigned char)(100 + (i * 13) % 155);
+        p.g = (unsigned char)(100 + (i * 29) % 155);
+        p.b = (unsigned char)(180 + (i * 7) % 75);
         p.a = 255;
 
         particles.push_back(p);
@@ -72,49 +87,53 @@ void RaylibView::initParticlesCPU() {
 }
 
 void RaylibView::stepParticlesCPU(float dt) {
-    for (std::size_t i = 0; i < particles.size(); ++i) {
-        Particle& part = particles[i];
+    int width = curW.load();
+    int height = curH.load();
+    if (width <= 0) width = 800;
+    if (height <= 0) height = 450;
 
-        // gravity
-        part.vy += gravityY * dt;
+    for (auto& p : particles) {
+        // gravité
+        p.vy += gravityY * dt;
 
-        // damping
-        part.vx *= damping;
-        part.vy *= damping;
+        // frottement global
+        p.vx *= damping;
+        p.vy *= damping;
 
-        // integrate
-        part.x += part.vx * dt;
-        part.y += part.vy * dt;
+        // intégration
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
 
-        // ground collision
-        if (part.y > groundY) {
-            part.y = groundY;
-            part.vy *= -0.5f;
+        float r = p.radius;
+		const float bounce = 0.9f; //0.8f;
+
+        // collision horizontale
+        if (p.x < r) {
+            p.x = r;
+            p.vx = -p.vx * bounce;
+        }
+        else if (p.x > width - r) {
+            p.x = width - r;
+            p.vx = -p.vx * bounce;
         }
 
-        // life decrease
-        part.life -= dt;
-        if (part.life < 0.0f) {
-            // respawn
-            part.x    = 50.0f;
-            part.y    = 50.0f;
-            part.vx   = 40.0f * static_cast<float>((i % 12) - 6);
-            part.vy   = -220.0f - static_cast<float>(i % 80);
-            part.life = 4.0f;
-
-            // quick color change
-            part.r = static_cast<unsigned char>(200 + (i % 55));
-            part.g = static_cast<unsigned char>(120 + (i % 80));
-            part.b = 180;
-            part.a = 255;
+        // collision verticale
+        if (p.y < r) {
+            p.y = r;
+            p.vy = -p.vy * bounce;
+        }
+        else if (p.y > height - r) {
+            p.y = height - r;
+            p.vy = -p.vy * bounce;
         }
     }
 }
 
+
+/* PARICULES GPU - Methods */
 void RaylibView::stepParticlesGPU(float dt) {
 #ifndef USE_CUDA
     (void)dt;
-    // If CUDA is not available, fallback to CPU
     stepParticlesCPU(dt);
 #else
     if (particles.empty()) return;
@@ -125,12 +144,16 @@ void RaylibView::stepParticlesGPU(float dt) {
     }
 
     int count = static_cast<int>(particles.size());
+    int width = curW.load();
+    int height = curH.load();
+    if (width <= 0) width = 800;
+    if (height <= 0) height = 450;
 
     // host -> device
     cuda_particles_upload(particles.data(), count);
 
     // physics on GPU
-    cuda_particles_step(dt, gravityY, damping, groundY, count);
+    cuda_particles_step(dt, gravityY, damping, width, height, count);
 
     // device -> host
     cuda_particles_download(particles.data(), count);
@@ -150,16 +173,17 @@ void RaylibView::startRaylibThread() {
         // Eviter que la touche ESC ne ferme la fenetre
         SetExitKey(0);
 
-        int W = reqW.load(), H = reqH.load();
-        if (W <= 0) W = 800; if (H <= 0) H = 450;
+        int W = reqW.load();
+        int H = reqH.load();
+        if (W <= 0) W = 800; 
+        if (H <= 0) H = 450;
 
         // 1) Creer la fenetre Raylib
-        InitWindow(W, H, "PartiQle Studio - CPU Particles");
+        InitWindow(W, H, "PartiQle Studio - Particles");
         SetTargetFPS(60);
 
         curW.store(W);
         curH.store(H);
-        groundY = static_cast<float>(H - 50);
 
 		// Initialiser les particules
         initParticlesCPU();
@@ -180,7 +204,8 @@ void RaylibView::startRaylibThread() {
                 SetWindowSize(rw, rh);
                 curW.store(rw);
                 curH.store(rh);
-                groundY = static_cast<float>(rh - 50);
+
+                //initParticlesCPU();
             }
 
             // dt
@@ -191,10 +216,9 @@ void RaylibView::startRaylibThread() {
 
             // raccourcis touche G
 #ifdef USE_CUDA
-            if (IsKeyPressed(KEY_G)) {
-                bool old = useGPU.load();
-                useGPU.store(!old);
-            }
+            bool gpuNow = useGPU.load();
+            SetWindowTitle(gpuNow ? "PartiQle Studio - GPU mode"
+                : "PartiQle Studio - CPU mode");
 #endif
 
             // simulation
@@ -216,27 +240,26 @@ void RaylibView::startRaylibThread() {
 
             BeginDrawing();
             ClearBackground(bg);
-            DrawLine(0, (int)groundY, curW.load(), (int)groundY, DARKGRAY);
 
-            // draw particles
+			// Dessin des particules
             for (const auto& part : particles) {
-                Color c = {
-                    part.r,
-                    part.g,
-                    part.b,
-                    part.a
-                };
+                Color c = { part.r, part.g, part.b, part.a };
                 DrawCircleV(Vector2{ part.x, part.y }, part.radius, c);
             }
 
 #ifdef USE_CUDA
             const char* mode = useGPU.load() ? "GPU" : "CPU";
             DrawText(TextFormat("Mode: %s (press G to toggle)", mode),
-                     10, 10, 20, RAYWHITE);
+                     10, 10, 20, GREEN);
+            if (useGPU.load())
+                DrawText("GPU ACTIVE", 10, 40, 20, GREEN);
+            else
+                DrawText("CPU ACTIVE", 10, 40, 20, RED);
+
 #else
             // Exemple minimal de drawing (remarque : DrawText utilise la police par defaut)
             DrawText("Mode: CPU (CUDA not available)",
-                     10, 10, 20, RAYWHITE);
+                10, 10, 20, DARKGRAY);
 #endif
 
             EndDrawing();
