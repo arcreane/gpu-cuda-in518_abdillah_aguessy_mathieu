@@ -2,29 +2,12 @@
 <ui version="4.0">
  <class>MainWindowClass</class>
  <widget class="QMainWindow" name="MainWindowClass">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>920</width>
-    <height>601</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>MainWindow</string>
-  </property>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>920</width><height>601</height></rect></property>
+  <property name="windowTitle"><string>MainWindow</string></property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QPushButton" name="btnRunCuda">
-      <property name="text">
-       <string>Run CUDA</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="raylibPlaceholder" native="true"/>
-    </item>
+    <item><widget class="QPushButton" name="btnRunCuda"><property name="text"><string>Run CUDA</string></property></widget></item>
+    <item><widget class="QWidget" name="raylibPlaceholder" native="true"/></item>
     <item>
      <widget class="QWidget" name="renderWidget">
       <property name="sizePolicy"><sizepolicy hsizetype="Expanding" vsizetype="Expanding"/></property>
@@ -37,18 +20,32 @@
       <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
       <property name="maximumSize"><size><width>300</width><height>16777215</height></size></property>
       <layout class="QVBoxLayout" name="verticalLayoutControl">
-       <!-- Commit2: groupSimulation (vide structure) -->
        <item>
         <widget class="QGroupBox" name="groupSimulation">
          <property name="title"><string>Simulation</string></property>
-         <layout class="QFormLayout" name="formLayoutSimulation"/>
+         <layout class="QFormLayout" name="formLayoutSimulation">
+          <item row="0" column="0"><widget class="QLabel" name="labelParticles"><property name="text"><string>Particles</string></property></widget></item>
+          <item row="0" column="1"><widget class="QSpinBox" name="spinParticles"/></item>
+          <item row="1" column="0"><widget class="QLabel" name="labelRmin"><property name="text"><string>R min</string></property></widget></item>
+          <item row="1" column="1"><widget class="QSlider" name="sliderRmin"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget></item>
+          <item row="2" column="0"><widget class="QLabel" name="labelRmax"><property name="text"><string>R max</string></property></widget></item>
+          <item row="2" column="1"><widget class="QSlider" name="sliderRmax"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget></item>
+         </layout>
         </widget>
        </item>
-       <!-- Commit2: groupPhysics (vide structure) -->
        <item>
         <widget class="QGroupBox" name="groupPhysics">
          <property name="title"><string>Physique</string></property>
-         <layout class="QFormLayout" name="formLayoutPhysics"/>
+         <layout class="QFormLayout" name="formLayoutPhysics">
+          <item row="0" column="0"><widget class="QLabel" name="labelVmin"><property name="text"><string>V min</string></property></widget></item>
+          <item row="0" column="1"><widget class="QSlider" name="sliderVmin"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget></item>
+          <item row="1" column="0"><widget class="QLabel" name="labelVmax"><property name="text"><string>V max</string></property></widget></item>
+          <item row="1" column="1"><widget class="QSlider" name="sliderVmax"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget></item>
+          <item row="2" column="0"><widget class="QLabel" name="labelElasticity"><property name="text"><string>Elasticity</string></property></widget></item>
+          <item row="2" column="1"><widget class="QDoubleSpinBox" name="spinElasticity"/></item>
+          <item row="3" column="0"><widget class="QLabel" name="labelFriction"><property name="text"><string>Friction</string></property></widget></item>
+          <item row="3" column="1"><widget class="QDoubleSpinBox" name="spinFriction"/></item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -64,19 +61,12 @@
    <addaction name="menuFichier"/><addaction name="menuView"/><addaction name="menuOptions"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <attribute name="toolBarArea"><enum>TopToolBarArea</enum></attribute>
+   <attribute name="toolBarBreak"><bool>false</bool></attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
- <slots>
-  <slot>on_btnRunCuda_clicked()</slot>
- </slots>
+ <resources/><connections/>
+ <slots><slot>on_btnRunCuda_clicked()</slot></slots>
 </ui>
