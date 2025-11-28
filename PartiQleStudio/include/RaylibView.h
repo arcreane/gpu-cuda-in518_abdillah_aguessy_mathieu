@@ -68,7 +68,7 @@ private:
     float damping = 0.999f;
 
 	std::atomic<bool> useGPU{ false };
-    std::atomic<bool> paused{ false };
+    std::atomic<bool> paused{ true };
 
     // Stats pour le panneau Qt
     std::atomic<float> lastFrameMs{ 0.0f };

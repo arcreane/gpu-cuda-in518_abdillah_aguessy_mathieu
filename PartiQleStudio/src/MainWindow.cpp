@@ -29,14 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui.radioGPU->setChecked(false);
     rlView->setUseGPU(false);
 
-	// spinParticles
-    rlView->setParticleCount(ui.spinParticles->value());
-
 	// Timer stats
     statsTimer = new QTimer(this);
     connect(statsTimer, &QTimer::timeout,
         this, &MainWindow::updateStats);
     statsTimer->start(200); // tous les 200 ms
+
+	// Etat initial des boutons de pause
+    ui.buttonPause->setEnabled(false);
+    ui.buttonPause->setText("Pause");
 
 }
 
@@ -118,26 +119,55 @@ void MainWindow::on_radioGPU_toggled(bool checked)
 void MainWindow::on_buttonStart_clicked()
 {
     if (!rlView) return;
+    int count = ui.spinParticles->value();
+    rlView->setParticleCount(count);
+
     rlView->setPaused(false);
+    
+    ui.labelParticleCount->setText(QString("Particles: %1").arg(count));
+    ui.buttonPause->setEnabled(true);
+    ui.buttonPause->setText("Pause");
+
+	ui.spinParticles->setEnabled(false); // désactiver le spinbox pendant la simulation
+	ui.sliderRmax->setEnabled(false);
+	ui.sliderRmin->setEnabled(false);
 }
 
 void MainWindow::on_buttonPause_clicked()
 {
     if (!rlView) return;
-    rlView->setPaused(true);
+    bool currentlyPaused = rlView->isPaused();
+    bool newPaused = !currentlyPaused;
+    rlView->setPaused(newPaused);
+
+    if (newPaused) {
+        ui.buttonPause->setText("Reprendre");
+    }
+    else {
+        ui.buttonPause->setText("Pause");
+    }
 }
 
 void MainWindow::on_buttonReset_clicked()
 {
     if (!rlView) return;
     rlView->resetSimulation();
+	rlView->setPaused(true); // mettre en pause après reset
+
+    ui.buttonPause->setEnabled(false);
+    ui.buttonPause->setText("Pause");
+
+    ui.labelParticleCount->setText("Particles: 0");
+
+	ui.spinParticles->setEnabled(true); // réactiver le spinbox après reset
+    ui.sliderRmax->setEnabled(true);
+    ui.sliderRmin->setEnabled(true);
 }
 
 /* ============ spinParticles → RaylibView ============ */
 void MainWindow::on_spinParticles_valueChanged(int value)
 {
     if (!rlView) return;
-    rlView->setParticleCount(value);
     ui.labelParticleCount->setText(QString("Particles: %1").arg(value));
 }
 
