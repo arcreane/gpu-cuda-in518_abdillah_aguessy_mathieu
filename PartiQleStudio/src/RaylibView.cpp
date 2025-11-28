@@ -40,6 +40,22 @@ void RaylibView::setUseGPU(bool enabled) {
 #endif
 }
 
+void RaylibView::setPaused(bool p) {
+    paused.store(p, std::memory_order_relaxed);
+}
+
+void RaylibView::resetSimulation() {
+    initParticlesCPU();
+}
+
+
+void RaylibView::setParticleCount(int count) {
+    if (count < 0) count = 0;
+    if (count > maxParticles) count = maxParticles;
+    desiredParticles.store(count, std::memory_order_relaxed);
+    initParticlesCPU();
+}
+
 void RaylibView::resizeEvent(QResizeEvent* ev) {
     QWidget::resizeEvent(ev);
     reqW.store(ev->size().width());
@@ -48,15 +64,17 @@ void RaylibView::resizeEvent(QResizeEvent* ev) {
 
 /* PARICULES CPU - Methods */
 void RaylibView::initParticlesCPU() {
-    particles.clear();
-    particles.reserve(maxParticles);
-
     int width = curW.load();
     int height = curH.load();
     if (width <= 0)  width = 800;
     if (height <= 0) height = 450;
 
-    int count = maxParticles;
+    int count = desiredParticles.load();
+    if (count <= 0) count = 0;
+    if (count > maxParticles) count = maxParticles;
+
+    particles.clear();
+    particles.reserve(maxParticles);
 
     for (int i = 0; i < count; ++i) {
         Particle p;
@@ -92,6 +110,8 @@ void RaylibView::stepParticlesCPU(float dt) {
     if (width <= 0) width = 800;
     if (height <= 0) height = 450;
 
+    const float bounce = 0.9f;
+
     for (auto& p : particles) {
         // gravité
         p.vy += gravityY * dt;
@@ -105,7 +125,6 @@ void RaylibView::stepParticlesCPU(float dt) {
         p.y += p.vy * dt;
 
         float r = p.radius;
-		const float bounce = 0.9f; //0.8f;
 
         // collision horizontale
         if (p.x < r) {
@@ -204,8 +223,6 @@ void RaylibView::startRaylibThread() {
                 SetWindowSize(rw, rh);
                 curW.store(rw);
                 curH.store(rh);
-
-                //initParticlesCPU();
             }
 
             // dt
@@ -216,16 +233,17 @@ void RaylibView::startRaylibThread() {
 
             // raccourcis touche G
 #ifdef USE_CUDA
-            bool gpuNow = useGPU.load();
+            bool gpuNow = useGPU.load(std::memory_order_relaxed);
             SetWindowTitle(gpuNow ? "PartiQle Studio - GPU mode"
                 : "PartiQle Studio - CPU mode");
 #endif
 
             // simulation
 #ifdef USE_CUDA
-            if (useGPU.load()) {
+            if (useGPU.load(std::memory_order_relaxed)) {
                 stepParticlesGPU(dt);
-            } else {
+            }
+            else {
                 stepParticlesCPU(dt);
             }
 #else
@@ -248,9 +266,9 @@ void RaylibView::startRaylibThread() {
             }
 
 #ifdef USE_CUDA
-            const char* mode = useGPU.load() ? "GPU" : "CPU";
-            DrawText(TextFormat("Mode: %s (press G to toggle)", mode),
-                     10, 10, 20, GREEN);
+            const char* mode = useGPU.load(std::memory_order_relaxed) ? "GPU" : "CPU";
+            DrawText(TextFormat("Mode: %s", mode),
+                10, 10, 20, GREEN);
             if (useGPU.load())
                 DrawText("GPU ACTIVE", 10, 40, 20, GREEN);
             else
