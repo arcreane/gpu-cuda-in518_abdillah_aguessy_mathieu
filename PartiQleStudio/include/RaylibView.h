@@ -21,6 +21,18 @@ public:
     void setUseGPU(bool enabled);
     bool isUsingGPU() const { return useGPU.load(); }
 
+    // Gestion simulation (buttons)
+    void setPaused(bool p);
+    bool isPaused() const { return paused.load(); }
+
+    void resetSimulation();           // init les particules
+    void setParticleCount(int count); // spinParticles
+
+    // Stats
+    float fps() const { return lastFps.load(); }
+    float frameTimeMs() const { return lastFrameMs.load(); }
+    int   particleCount() const { return lastParticleCount.load(); }
+
 protected:
     void resizeEvent(QResizeEvent* event) override;
 
@@ -49,11 +61,19 @@ private:
 
     // particle simulation
     std::vector<Particle> particles;
-    int   maxParticles = 10000;
+    int   maxParticles = 100000;                // capacité max
+	std::atomic<int> desiredParticles{ 1000 };  // spinParticles
+
     float gravityY = 0.1f;
     float damping = 0.999f;
 
-	std::atomic<bool>   useGPU{ false };
+	std::atomic<bool> useGPU{ false };
+    std::atomic<bool> paused{ true };
+
+    // Stats pour le panneau Qt
+    std::atomic<float> lastFrameMs{ 0.0f };
+    std::atomic<float> lastFps{ 0.0f };
+    std::atomic<int>   lastParticleCount{ 0 };
 
 #ifdef USE_CUDA
 	bool cudaInitialized = false;

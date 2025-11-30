@@ -40,6 +40,24 @@ void RaylibView::setUseGPU(bool enabled) {
 #endif
 }
 
+void RaylibView::setPaused(bool p) {
+    paused.store(p, std::memory_order_relaxed);
+}
+
+void RaylibView::resetSimulation() {
+	paused.store(true, std::memory_order_relaxed);              // pause la simulation
+    particles.clear();                                          // Vide toutes les particules
+	lastParticleCount.store(0, std::memory_order_relaxed);      // stats
+}
+
+
+void RaylibView::setParticleCount(int count) {
+    if (count < 0) count = 0;
+    if (count > maxParticles) count = maxParticles;
+    desiredParticles.store(count, std::memory_order_relaxed);
+    initParticlesCPU();
+}
+
 void RaylibView::resizeEvent(QResizeEvent* ev) {
     QWidget::resizeEvent(ev);
     reqW.store(ev->size().width());
@@ -48,15 +66,17 @@ void RaylibView::resizeEvent(QResizeEvent* ev) {
 
 /* PARICULES CPU - Methods */
 void RaylibView::initParticlesCPU() {
-    particles.clear();
-    particles.reserve(maxParticles);
-
     int width = curW.load();
     int height = curH.load();
     if (width <= 0)  width = 800;
     if (height <= 0) height = 450;
 
-    int count = maxParticles;
+    int count = desiredParticles.load();
+    if (count <= 0) count = 0;
+    if (count > maxParticles) count = maxParticles;
+
+    particles.clear();
+    particles.reserve(maxParticles);
 
     for (int i = 0; i < count; ++i) {
         Particle p;
@@ -92,6 +112,8 @@ void RaylibView::stepParticlesCPU(float dt) {
     if (width <= 0) width = 800;
     if (height <= 0) height = 450;
 
+    const float bounce = 0.9f;
+
     for (auto& p : particles) {
         // gravité
         p.vy += gravityY * dt;
@@ -105,7 +127,6 @@ void RaylibView::stepParticlesCPU(float dt) {
         p.y += p.vy * dt;
 
         float r = p.radius;
-		const float bounce = 0.9f; //0.8f;
 
         // collision horizontale
         if (p.x < r) {
@@ -185,9 +206,6 @@ void RaylibView::startRaylibThread() {
         curW.store(W);
         curH.store(H);
 
-		// Initialiser les particules
-        initParticlesCPU();
-
         // 2) Recuperer le handle natif et le transmettre a Qt
         void* native = GetWindowHandle();
         p->set_value(native);
@@ -204,8 +222,6 @@ void RaylibView::startRaylibThread() {
                 SetWindowSize(rw, rh);
                 curW.store(rw);
                 curH.store(rh);
-
-                //initParticlesCPU();
             }
 
             // dt
@@ -214,25 +230,33 @@ void RaylibView::startRaylibThread() {
             lastTime = now;
             if (dt > 0.05f) dt = 0.05f; // clamp
 
-            // raccourcis touche G
+            bool isPaused = paused.load(std::memory_order_relaxed);
+
 #ifdef USE_CUDA
-            bool gpuNow = useGPU.load();
+            bool gpuNow = useGPU.load(std::memory_order_relaxed);
             SetWindowTitle(gpuNow ? "PartiQle Studio - GPU mode"
                 : "PartiQle Studio - CPU mode");
 #endif
 
-            // simulation
+            // =====================
+            // 1) PHYSIQUE
+            // =====================
+            if (!isPaused) {
 #ifdef USE_CUDA
-            if (useGPU.load()) {
-                stepParticlesGPU(dt);
-            } else {
-                stepParticlesCPU(dt);
-            }
+                if (useGPU.load(std::memory_order_relaxed)) {
+                    stepParticlesGPU(dt);
+                }
+                else {
+                    stepParticlesCPU(dt);
+                }
 #else
-            stepParticlesCPU(dt);
+                stepParticlesCPU(dt);
 #endif
+            }
 
-            // set des couleurs (rgb)
+            // =====================
+            // 2) RENDU
+            // =====================
             int r = clrR.load();
             int g = clrG.load();
             int b = clrB.load();
@@ -248,9 +272,9 @@ void RaylibView::startRaylibThread() {
             }
 
 #ifdef USE_CUDA
-            const char* mode = useGPU.load() ? "GPU" : "CPU";
-            DrawText(TextFormat("Mode: %s (press G to toggle)", mode),
-                     10, 10, 20, GREEN);
+            const char* mode = useGPU.load(std::memory_order_relaxed) ? "GPU" : "CPU";
+            DrawText(TextFormat("Mode: %s", mode),
+                10, 10, 20, GREEN);
             if (useGPU.load())
                 DrawText("GPU ACTIVE", 10, 40, 20, GREEN);
             else
@@ -262,7 +286,61 @@ void RaylibView::startRaylibThread() {
                 10, 10, 20, DARKGRAY);
 #endif
 
+            // =====================
+            // 3) OVERLAY "PAUSE"
+            // =====================
+            if (isPaused && !particles.empty()) {
+                int w = curW.load();
+                int h = curH.load();
+                if (w <= 0) w = 800;
+                if (h <= 0) h = 450;
+
+                // léger voile sombre
+                DrawRectangle(0, 0, w, h, Fade(BLACK, 0.4f));
+
+                // symbole "||" au centre
+                int size = h / 4;
+                int barWidth = size / 4;
+                int barHeight = size;
+                int cx = w / 2;
+                int cy = h / 2;
+
+                Color pauseColor = RAYWHITE;
+
+                // barre gauche
+                DrawRectangle(cx - barWidth - barWidth / 2,
+                    cy - barHeight / 2,
+                    barWidth,
+                    barHeight,
+                    pauseColor);
+
+                // barre droite
+                DrawRectangle(cx + barWidth / 2,
+                    cy - barHeight / 2,
+                    barWidth,
+                    barHeight,
+                    pauseColor);
+
+                const char* txt = "PAUSE";
+                int fontSize = 40;
+                int textWidth = MeasureText(txt, fontSize);
+                DrawText(txt,
+                    cx - textWidth / 2,
+                    cy + barHeight / 2 + 10,
+                    fontSize,
+                    RAYWHITE);
+            }
+
             EndDrawing();
+
+            // =====================
+            // 4) STATS POUR Qt
+            // =====================
+            if (dt > 0.0f) {
+                lastFrameMs.store(dt * 1000.0f, std::memory_order_relaxed);
+                lastFps.store(1.0f / dt, std::memory_order_relaxed);
+            }
+            lastParticleCount.store((int)particles.size(), std::memory_order_relaxed);
         }
 
 #ifdef USE_CUDA
