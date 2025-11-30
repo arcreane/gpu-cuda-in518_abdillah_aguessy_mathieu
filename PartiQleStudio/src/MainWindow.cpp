@@ -39,6 +39,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui.buttonPause->setEnabled(false);
     ui.buttonPause->setText("Pause");
 
+    // Paramètre physique  
+    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
+    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+
+    if (ui.sliderVmin) {
+        rlView->setVelocityMin(static_cast<float>(ui.sliderVmin->value()));
+    }
+    if (ui.sliderVmax) {
+        rlView->setVelocityMax(static_cast<float>(ui.sliderVmax->value()));
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -131,6 +142,8 @@ void MainWindow::on_buttonStart_clicked()
 	ui.spinParticles->setEnabled(false); // désactiver le spinbox pendant la simulation
 	ui.sliderRmax->setEnabled(false);
 	ui.sliderRmin->setEnabled(false);
+    if (ui.sliderVmin) ui.sliderVmin->setEnabled(false);
+    if (ui.sliderVmax) ui.sliderVmax->setEnabled(false);
 }
 
 void MainWindow::on_buttonPause_clicked()
@@ -162,6 +175,8 @@ void MainWindow::on_buttonReset_clicked()
 	ui.spinParticles->setEnabled(true); // réactiver le spinbox après reset
     ui.sliderRmax->setEnabled(true);
     ui.sliderRmin->setEnabled(true);
+    if (ui.sliderVmin) ui.sliderVmin->setEnabled(true);
+    if (ui.sliderVmax) ui.sliderVmax->setEnabled(true);
 }
 
 /* ============ spinParticles → RaylibView ============ */
@@ -169,6 +184,42 @@ void MainWindow::on_spinParticles_valueChanged(int value)
 {
     if (!rlView) return;
     ui.labelParticleCount->setText(QString("Particles: %1").arg(value));
+}
+
+/* ============ spinElasticity → RaylibView ============ */
+void MainWindow::on_spinElasticity_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setElasticity(static_cast<float>(value));
+}
+
+/* ============ spinFriction → RaylibView ============ */
+void MainWindow::on_spinFriction_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setFriction(static_cast<float>(value));
+}
+
+void MainWindow::on_sliderVmin_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setVelocityMin(static_cast<float>(value));
+
+    // Optionnel: afficher la valeur dans un label
+    if (ui.labelVmin) {
+        ui.labelVmin->setText(QString("Vmin: %1").arg(value));
+    }
+}
+
+void MainWindow::on_sliderVmax_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setVelocityMax(static_cast<float>(value));
+
+    // Optionnel: afficher la valeur dans un label
+    if (ui.labelVmax) {
+        ui.labelVmax->setText(QString("Vmax: %1").arg(value));
+    }
 }
 
 /* ============ Mise à jour Stats ============ */

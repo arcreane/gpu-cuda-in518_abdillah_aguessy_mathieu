@@ -27,6 +27,10 @@ public:
 
     void resetSimulation();           // init les particules
     void setParticleCount(int count); // spinParticles
+	void setElasticity(float e);      // spinElasticity
+	void setFriction(float f);        // spinFriction
+    void setVelocityMin(float vmin);
+    void setVelocityMax(float vmax);
 
     // Stats
     float fps() const { return lastFps.load(); }
@@ -67,6 +71,11 @@ private:
     float gravityY = 0.1f;
     float damping = 0.999f;
 
+    std::atomic<float> frictionCoeff{ 0.0f };   // spinFriction
+    std::atomic<float> elasticity{ 0.9f };      // spinElasticity
+    std::atomic<float> velocityMin{ -50.0f };   // Vmin
+    std::atomic<float> velocityMax{ 50.0f };    // Vmax
+
 	std::atomic<bool> useGPU{ false };
     std::atomic<bool> paused{ true };
 
@@ -77,6 +86,7 @@ private:
 
 #ifdef USE_CUDA
 	bool cudaInitialized = false;
+    int lastUploadedCount = 0;
 #endif
 
 };

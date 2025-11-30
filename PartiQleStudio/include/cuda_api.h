@@ -24,6 +24,8 @@ extern "C" void cuda_particles_upload(const Particle* hostParticles, int count);
 extern "C" void cuda_particles_step(float dt,
                                     float gravityY,
                                     float damping,
+	                                float elasticity,
+	                                float frictionCoeff,
                                     int   screenW,
                                     int   screenH,
                                     int   count);
@@ -48,7 +50,7 @@ inline void cuda_particles_free() {}
 
 inline void cuda_particles_upload(const Particle*, int) {}
 
-inline void cuda_particles_step(float, float, float, int, int, int) {}
+inline void cuda_particles_step(float, float, float, float, float, int, int, int) {}
 
 inline void cuda_particles_download(Particle*, int) {}
 

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
+#include <cmath>
 
 static float frand(float a, float b) {
     return a + (b - a) * (float)rand() / (float)RAND_MAX;
@@ -44,10 +45,29 @@ void RaylibView::setPaused(bool p) {
     paused.store(p, std::memory_order_relaxed);
 }
 
+void RaylibView::setElasticity(float e) {
+    elasticity.store(e, std::memory_order_relaxed);
+}
+
+void RaylibView::setFriction(float f) {
+    frictionCoeff.store(f, std::memory_order_relaxed);
+}
+
+void RaylibView::setVelocityMin(float vmin) {
+    velocityMin.store(vmin, std::memory_order_relaxed);
+}
+
+void RaylibView::setVelocityMax(float vmax) {
+    velocityMax.store(vmax, std::memory_order_relaxed);
+}
+
 void RaylibView::resetSimulation() {
-	paused.store(true, std::memory_order_relaxed);              // pause la simulation
-    particles.clear();                                          // Vide toutes les particules
-	lastParticleCount.store(0, std::memory_order_relaxed);      // stats
+    paused.store(true, std::memory_order_relaxed);
+    particles.clear();
+    lastParticleCount.store(0, std::memory_order_relaxed);
+#ifdef USE_CUDA
+    lastUploadedCount = 0;
+#endif
 }
 
 
@@ -75,6 +95,9 @@ void RaylibView::initParticlesCPU() {
     if (count <= 0) count = 0;
     if (count > maxParticles) count = maxParticles;
 
+    float vmin = velocityMin.load(std::memory_order_relaxed);
+    float vmax = velocityMax.load(std::memory_order_relaxed);
+
     particles.clear();
     particles.reserve(maxParticles);
 
@@ -88,10 +111,8 @@ void RaylibView::initParticlesCPU() {
         p.y = frand(p.radius, height - p.radius);
         
         // v init légère et vers le haut
-        /*p.vx = frand(-50.0f, 50.0f);
-        p.vy = frand(-80.0f, -20.0f);*/
-        p.vx = frand(-15.0f, 15.0f);
-        p.vy = frand(-15.0f, 15.0f);
+        p.vx = frand(vmin, vmax);
+        p.vy = frand(vmin, vmax);
 
         p.life = 1.0f;
 
@@ -112,15 +133,31 @@ void RaylibView::stepParticlesCPU(float dt) {
     if (width <= 0) width = 800;
     if (height <= 0) height = 450;
 
-    const float bounce = 0.9f;
+    // Récupérer paramètres physiques depuis les atomics
+    float eps = elasticity.load(std::memory_order_relaxed);     // coefficient d'élasticité
+    float mu = frictionCoeff.load(std::memory_order_relaxed);  // frottement visqueux
 
+    // bornes raisonnables
+    if (eps < 0.0f) eps = 0.0f;
+    if (eps > 1.0f) eps = 1.0f;
+    if (mu < 0.0f) mu = 0.0f;
+
+    // Damping effectif par frame (base * frottement)
+    float perStepDamp = damping * (1.0f - mu * dt);
+    if (perStepDamp < 0.0f) perStepDamp = 0.0f;
+    if (perStepDamp > 1.0f) perStepDamp = 1.0f;
+
+    const int n = static_cast<int>(particles.size());
+    if (n <= 0) return;
+
+	// Integration  physique simple (gravite, frottement, collisions mur)
     for (auto& p : particles) {
         // gravité
         p.vy += gravityY * dt;
 
         // frottement global
-        p.vx *= damping;
-        p.vy *= damping;
+        p.vx *= perStepDamp;
+        p.vy *= perStepDamp;
 
         // intégration
         p.x += p.vx * dt;
@@ -131,21 +168,70 @@ void RaylibView::stepParticlesCPU(float dt) {
         // collision horizontale
         if (p.x < r) {
             p.x = r;
-            p.vx = -p.vx * bounce;
+            p.vx = -p.vx * eps;
         }
         else if (p.x > width - r) {
             p.x = width - r;
-            p.vx = -p.vx * bounce;
+            p.vx = -p.vx * eps;
         }
 
         // collision verticale
         if (p.y < r) {
             p.y = r;
-            p.vy = -p.vy * bounce;
+            p.vy = -p.vy * eps;
         }
         else if (p.y > height - r) {
             p.y = height - r;
-            p.vy = -p.vy * bounce;
+            p.vy = -p.vy * eps;
+        }
+    }
+
+    // Collisions inter-particules
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            Particle& a = particles[i];
+            Particle& b = particles[j];
+
+            float dx = b.x - a.x;
+            float dy = b.y - a.y;
+            float dist2 = dx * dx + dy * dy;
+
+            float rSum = a.radius + b.radius;
+            float rSum2 = rSum * rSum;
+
+            if (dist2 >= rSum2 || dist2 <= 1e-6f) {
+                continue; // pas de collision ou trop proche numériquement
+            }
+
+            float dist = std::sqrt(dist2);
+            float nx = dx / dist;
+            float ny = dy / dist;
+
+            // Correction de recouvrement (on sépare les cercles)
+            float overlap = rSum - dist;
+            float half = 0.5f * overlap;
+            a.x -= nx * half;
+            a.y -= ny * half;
+            b.x += nx * half;
+            b.y += ny * half;
+
+            // Vitesse relative le long de la normale
+            float rvx = b.vx - a.vx;
+            float rvy = b.vy - a.vy;
+            float vn = rvx * nx + rvy * ny;
+
+            // si les particules s'écartent déjà, pas de rebond
+            if (vn > 0.0f) continue;
+
+            // Masse = 1 pour tout le monde => formule simplifiée
+            float val = -(1.0f + eps) * vn / 2.0f;
+            float impulseX = val * nx;
+            float impulseY = val * ny;
+
+            a.vx -= impulseX;
+            a.vy -= impulseY;
+            b.vx += impulseX;
+            b.vy += impulseY;
         }
     }
 }
@@ -171,10 +257,17 @@ void RaylibView::stepParticlesGPU(float dt) {
     if (height <= 0) height = 450;
 
     // host -> device
-    cuda_particles_upload(particles.data(), count);
+    if (count != lastUploadedCount) {
+        cuda_particles_upload(particles.data(), count);
+        lastUploadedCount = count;
+    }
+
+    // Récupération des paramètres physiques
+    float eps = elasticity.load(std::memory_order_relaxed);
+    float mu = frictionCoeff.load(std::memory_order_relaxed);
 
     // physics on GPU
-    cuda_particles_step(dt, gravityY, damping, width, height, count);
+    cuda_particles_step(dt, gravityY, damping, eps, mu, width, height, count);
 
     // device -> host
     cuda_particles_download(particles.data(), count);

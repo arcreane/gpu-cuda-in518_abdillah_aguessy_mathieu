@@ -26,6 +26,10 @@ private slots:
 	void on_buttonReset_clicked();
 
 	void on_spinParticles_valueChanged(int value);
+	void on_spinElasticity_valueChanged(double value);
+	void on_spinFriction_valueChanged(double value);
+	void on_sliderVmin_valueChanged(int value);
+	void on_sliderVmax_valueChanged(int value);
 
 	void updateStats();
 
