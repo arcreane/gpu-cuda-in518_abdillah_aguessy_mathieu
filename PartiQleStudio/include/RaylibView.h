@@ -49,6 +49,8 @@ private:
     void stepParticlesCPU(float dt);
     void stepParticlesGPU(float dt);
 
+    void applyMouseForceCPU(float mouseX, float mouseY, float forceX, float forceY, float radius);
+
 private:
     std::thread         rlThread;
     std::atomic<bool>   running{ false };

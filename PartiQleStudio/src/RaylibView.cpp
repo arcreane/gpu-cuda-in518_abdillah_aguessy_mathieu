@@ -127,6 +127,24 @@ void RaylibView::initParticlesCPU() {
     }
 }
 
+void RaylibView::applyMouseForceCPU(float mouseX, float mouseY, float forceX, float forceY, float radius) {
+    const float radiusSq = radius * radius;
+
+    for (auto& p : particles) {
+        float dx = p.x - mouseX;
+        float dy = p.y - mouseY;
+        float distSq = dx * dx + dy * dy;
+
+        if (distSq < radiusSq && distSq > 1e-6f) {
+            float dist = std::sqrt(distSq);
+            float influence = 1.0f - (dist / radius); // Décroissance linéaire
+
+            p.vx += forceX * influence;
+            p.vy += forceY * influence;
+        }
+    }
+}
+
 void RaylibView::stepParticlesCPU(float dt) {
     int width = curW.load();
     int height = curH.load();
@@ -306,6 +324,11 @@ void RaylibView::startRaylibThread() {
         using clock = std::chrono::steady_clock;
         auto lastTime = clock::now();
 
+		// variables souris
+        float prevMouseX = 0.0f;
+        float prevMouseY = 0.0f;
+        bool wasMouseDown = false;
+
         // 3) rendu raylib
         while (running.load() && !WindowShouldClose()) {
             // handle resize
@@ -330,6 +353,25 @@ void RaylibView::startRaylibThread() {
             SetWindowTitle(gpuNow ? "PartiQle Studio - GPU mode"
                 : "PartiQle Studio - CPU mode");
 #endif
+			// Récupérer état souris
+            Vector2 mousePos = GetMousePosition();
+            float mouseX = mousePos.x;
+            float mouseY = mousePos.y;
+            bool isMouseDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+
+            // Calculer la vitesse du curseur (en pixels/frame)
+            float mouseVelX = (mouseX - prevMouseX) / dt;
+            float mouseVelY = (mouseY - prevMouseY) / dt;
+
+            // Force proportionnelle à la vitesse (facteur d'échelle)
+            const float forceScale = 0.5f; // Ajustez selon vos besoins
+            const float mouseRadius = 100.0f; // Rayon d'influence en pixels
+
+            float forceX = mouseVelX * forceScale;
+            float forceY = mouseVelY * forceScale;
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
 
             // =====================
             // 1) PHYSIQUE
@@ -338,12 +380,27 @@ void RaylibView::startRaylibThread() {
 #ifdef USE_CUDA
                 if (useGPU.load(std::memory_order_relaxed)) {
                     stepParticlesGPU(dt);
+
+                    // Appliquer la force de la souris (GPU)
+                    if (isMouseDown) {
+                        cuda_apply_mouse_force(mouseX, mouseY, forceX, forceY, mouseRadius, particles.size());
+                    }
                 }
                 else {
                     stepParticlesCPU(dt);
+
+                    // Appliquer la force de la souris (CPU)
+                    if (isMouseDown) {
+                        applyMouseForceCPU(mouseX, mouseY, forceX, forceY, mouseRadius);
+                    }
                 }
 #else
                 stepParticlesCPU(dt);
+
+                // Appliquer la force de la souris (CPU uniquement)
+                if (isMouseDown) {
+                    applyMouseForceCPU(mouseX, mouseY, forceX, forceY, mouseRadius);
+                }
 #endif
             }
 
@@ -364,6 +421,13 @@ void RaylibView::startRaylibThread() {
                 DrawCircleV(Vector2{ part.x, part.y }, part.radius, c);
             }
 
+            //Afficher le rayon d'influence de la souris
+            if (isMouseDown) {
+                DrawCircleLines((int)mouseX, (int)mouseY, mouseRadius,
+                    Fade(YELLOW, 0.5f));
+                DrawCircleV(Vector2{ mouseX, mouseY }, 5.0f, RED);
+            }
+
 #ifdef USE_CUDA
             const char* mode = useGPU.load(std::memory_order_relaxed) ? "GPU" : "CPU";
             DrawText(TextFormat("Mode: %s", mode),
@@ -378,6 +442,9 @@ void RaylibView::startRaylibThread() {
             DrawText("Mode: CPU (CUDA not available)",
                 10, 10, 20, DARKGRAY);
 #endif
+			// Infos souris et force DEBUG
+            DrawText(TextFormat("Mouse: (%.0f, %.0f)", mouseX, mouseY), 10, 70, 20, BLUE);
+            DrawText(TextFormat("Force: (%.1f, %.1f)", forceX, forceY), 10, 95, 20, BLUE);
 
             // =====================
             // 3) OVERLAY "PAUSE"
@@ -434,6 +501,7 @@ void RaylibView::startRaylibThread() {
                 lastFps.store(1.0f / dt, std::memory_order_relaxed);
             }
             lastParticleCount.store((int)particles.size(), std::memory_order_relaxed);
+			wasMouseDown = isMouseDown;
         }
 
 #ifdef USE_CUDA

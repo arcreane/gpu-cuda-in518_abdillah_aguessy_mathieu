@@ -238,3 +238,51 @@ extern "C" void cuda_particles_download(Particle* hostParticles, int count) {
 
 // La fonction cuda_demo_dump n'est plus nécessaire pour la simulation
 extern "C" void cuda_demo_dump(int, int, int*, int*, int*, int*) {}
+
+// --------------------------------------------------
+// Kernel pour appliquer la force de la souris
+// --------------------------------------------------
+__global__ void kernel_apply_mouse_force(
+    Particle* particles, int count,
+    float mouseX, float mouseY,
+    float forceX, float forceY,
+    float radius)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= count) return;
+
+    Particle& p = particles[i];
+
+    float dx = p.x - mouseX;
+    float dy = p.y - mouseY;
+    float distSq = dx * dx + dy * dy;
+    float radiusSq = radius * radius;
+
+    if (distSq < radiusSq && distSq > 1e-6f) {
+        float dist = sqrtf(distSq);
+        float influence = 1.0f - (dist / radius); // Décroissance linéaire
+
+        p.vx += forceX * influence;
+        p.vy += forceY * influence;
+    }
+}
+
+// --------------------------------------------------
+// API C pour la force de souris
+// --------------------------------------------------
+extern "C" void cuda_apply_mouse_force(
+    float mouseX, float mouseY,
+    float forceX, float forceY,
+    float radius, int count)
+{
+    if (!d_particles || count <= 0) return;
+
+    int blockSize = 256;
+    int gridSize = (count + blockSize - 1) / blockSize;
+
+    kernel_apply_mouse_force << <gridSize, blockSize >> > (
+        d_particles, count, mouseX, mouseY, forceX, forceY, radius
+        );
+
+    CUDA_CHECK(cudaDeviceSynchronize());
+}
