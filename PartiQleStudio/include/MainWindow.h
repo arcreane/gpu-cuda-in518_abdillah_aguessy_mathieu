@@ -31,6 +31,9 @@ private slots:
 	void on_sliderVmin_valueChanged(int value);
 	void on_sliderVmax_valueChanged(int value);
 
+	void on_spinMouseRadius_valueChanged(int value);
+	void on_spinMouseForce_valueChanged(double value);
+
 	void updateStats();
 
 private:

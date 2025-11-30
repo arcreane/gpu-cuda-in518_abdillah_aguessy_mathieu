@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
     rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
 
+    rlView->setMouseRadius(ui.spinMouseRadius->value());
+    rlView->setMouseForce(static_cast<float>(ui.spinMouseForce->value()));
+
     if (ui.sliderVmin) {
         rlView->setVelocityMin(static_cast<float>(ui.sliderVmin->value()));
     }
@@ -220,6 +223,18 @@ void MainWindow::on_sliderVmax_valueChanged(int value)
     if (ui.labelVmax) {
         ui.labelVmax->setText(QString("Vmax: %1").arg(value));
     }
+}
+
+void MainWindow::on_spinMouseRadius_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setMouseRadius(value);
+}
+
+void MainWindow::on_spinMouseForce_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setMouseForce(static_cast<float>(value));
 }
 
 /* ============ Mise à jour Stats ============ */

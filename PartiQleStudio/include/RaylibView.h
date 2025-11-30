@@ -31,6 +31,8 @@ public:
 	void setFriction(float f);        // spinFriction
     void setVelocityMin(float vmin);
     void setVelocityMax(float vmax);
+    void setMouseRadius(int radius);
+    void setMouseForce(float force);
 
     // Stats
     float fps() const { return lastFps.load(); }
@@ -49,7 +51,7 @@ private:
     void stepParticlesCPU(float dt);
     void stepParticlesGPU(float dt);
 
-    void applyMouseForceCPU(float mouseX, float mouseY, float forceX, float forceY, float radius);
+    void applyMouseForceCPU(float mouseX, float mouseY, float velX, float velY, int mode);
 
 private:
     std::thread         rlThread;
@@ -77,6 +79,9 @@ private:
     std::atomic<float> elasticity{ 0.9f };      // spinElasticity
     std::atomic<float> velocityMin{ -50.0f };   // Vmin
     std::atomic<float> velocityMax{ 50.0f };    // Vmax
+
+    std::atomic<int>   mouseRadius{ 100 };      // Rayon d'action (pixels)
+    std::atomic<float> mouseForceScale{ 0.5f }; // Multiplicateur de force
 
 	std::atomic<bool> useGPU{ false };
     std::atomic<bool> paused{ true };

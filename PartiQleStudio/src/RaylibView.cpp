@@ -61,6 +61,59 @@ void RaylibView::setVelocityMax(float vmax) {
     velocityMax.store(vmax, std::memory_order_relaxed);
 }
 
+void RaylibView::setMouseRadius(int radius) {
+    mouseRadius.store(radius, std::memory_order_relaxed);
+}
+
+void RaylibView::setMouseForce(float force) {
+    mouseForceScale.store(force, std::memory_order_relaxed);
+}
+
+void RaylibView::applyMouseForceCPU(float mouseX, float mouseY, float velX, float velY, int mode) {
+    float radius = static_cast<float>(mouseRadius.load(std::memory_order_relaxed));
+    float forceScale = mouseForceScale.load(std::memory_order_relaxed);
+    const float radiusSq = radius * radius;
+
+    for (auto& p : particles) {
+        float dx = p.x - mouseX;
+        float dy = p.y - mouseY;
+        float distSq = dx * dx + dy * dy;
+
+        if (distSq < radiusSq && distSq > 1e-6f) {
+            float dist = std::sqrt(distSq);
+            float nx = dx / dist; // Normale depuis souris vers particule
+            float ny = dy / dist;
+
+            float influence = 1.0f - (dist / radius); // Décroissance linéaire
+
+            switch (mode) {
+            case 0: // Survol : Pousse dans la direction du mouvement
+            {
+                p.vx += velX * forceScale * influence;
+                p.vy += velY * forceScale * influence;
+                break;
+            }
+
+            case 1: // Clic gauche : Attire vers la souris
+            {
+                float attractForce = forceScale * 200.0f * influence;
+                p.vx -= nx * attractForce;
+                p.vy -= ny * attractForce;
+                break;
+            }
+
+            case 2: // Clic droit : Explosion (repousse)
+            {
+                float explosionForce = forceScale * 300.0f * influence;
+                p.vx += nx * explosionForce;
+                p.vy += ny * explosionForce;
+                break;
+            }
+            }
+        }
+    }
+}
+
 void RaylibView::resetSimulation() {
     paused.store(true, std::memory_order_relaxed);
     particles.clear();
@@ -69,7 +122,6 @@ void RaylibView::resetSimulation() {
     lastUploadedCount = 0;
 #endif
 }
-
 
 void RaylibView::setParticleCount(int count) {
     if (count < 0) count = 0;
@@ -124,24 +176,6 @@ void RaylibView::initParticlesCPU() {
         p.a = 255;
 
         particles.push_back(p);
-    }
-}
-
-void RaylibView::applyMouseForceCPU(float mouseX, float mouseY, float forceX, float forceY, float radius) {
-    const float radiusSq = radius * radius;
-
-    for (auto& p : particles) {
-        float dx = p.x - mouseX;
-        float dy = p.y - mouseY;
-        float distSq = dx * dx + dy * dy;
-
-        if (distSq < radiusSq && distSq > 1e-6f) {
-            float dist = std::sqrt(distSq);
-            float influence = 1.0f - (dist / radius); // Décroissance linéaire
-
-            p.vx += forceX * influence;
-            p.vy += forceY * influence;
-        }
     }
 }
 
@@ -327,7 +361,6 @@ void RaylibView::startRaylibThread() {
 		// variables souris
         float prevMouseX = 0.0f;
         float prevMouseY = 0.0f;
-        bool wasMouseDown = false;
 
         // 3) rendu raylib
         while (running.load() && !WindowShouldClose()) {
@@ -353,25 +386,35 @@ void RaylibView::startRaylibThread() {
             SetWindowTitle(gpuNow ? "PartiQle Studio - GPU mode"
                 : "PartiQle Studio - CPU mode");
 #endif
-			// Récupérer état souris
+            // Gestion de la souris (3 modes)
             Vector2 mousePos = GetMousePosition();
             float mouseX = mousePos.x;
             float mouseY = mousePos.y;
-            bool isMouseDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 
-            // Calculer la vitesse du curseur (en pixels/frame)
+            bool isLeftMouseDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+            bool isRightMouseDown = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
+
+            // Calculer la vitesse du curseur (en pixels/sec)
             float mouseVelX = (mouseX - prevMouseX) / dt;
             float mouseVelY = (mouseY - prevMouseY) / dt;
 
-            // Force proportionnelle à la vitesse (facteur d'échelle)
-            const float forceScale = 0.5f; // Ajustez selon vos besoins
-            const float mouseRadius = 100.0f; // Rayon d'influence en pixels
-
-            float forceX = mouseVelX * forceScale;
-            float forceY = mouseVelY * forceScale;
-
             prevMouseX = mouseX;
             prevMouseY = mouseY;
+
+            int mouseMode = -1; // -1 = pas d'interaction
+            if (isRightMouseDown) {
+                mouseMode = 2; // Explosion
+            }
+            else if (isLeftMouseDown) {
+                mouseMode = 1; // Attraction
+            }
+            else {
+                // Survol uniquement si la souris bouge suffisamment
+                float speed = std::sqrt(mouseVelX * mouseVelX + mouseVelY * mouseVelY);
+                if (speed > 10.0f) { // Seuil de vitesse
+                    mouseMode = 0; // Pousse
+                }
+            }
 
             // =====================
             // 1) PHYSIQUE
@@ -382,24 +425,26 @@ void RaylibView::startRaylibThread() {
                     stepParticlesGPU(dt);
 
                     // Appliquer la force de la souris (GPU)
-                    if (isMouseDown) {
-                        cuda_apply_mouse_force(mouseX, mouseY, forceX, forceY, mouseRadius, particles.size());
+                    if (mouseMode >= 0) {
+                        cuda_particles_download(particles.data(), particles.size());
+                        applyMouseForceCPU(mouseX, mouseY, mouseVelX, mouseVelY, mouseMode);
+                        cuda_particles_upload(particles.data(), particles.size());
                     }
                 }
                 else {
                     stepParticlesCPU(dt);
 
                     // Appliquer la force de la souris (CPU)
-                    if (isMouseDown) {
-                        applyMouseForceCPU(mouseX, mouseY, forceX, forceY, mouseRadius);
+                    if (mouseMode >= 0) {
+                        applyMouseForceCPU(mouseX, mouseY, mouseVelX, mouseVelY, mouseMode);
                     }
                 }
 #else
                 stepParticlesCPU(dt);
 
                 // Appliquer la force de la souris (CPU uniquement)
-                if (isMouseDown) {
-                    applyMouseForceCPU(mouseX, mouseY, forceX, forceY, mouseRadius);
+                if (mouseMode >= 0) {
+                    applyMouseForceCPU(mouseX, mouseY, mouseVelX, mouseVelY, mouseMode);
                 }
 #endif
             }
@@ -422,10 +467,24 @@ void RaylibView::startRaylibThread() {
             }
 
             //Afficher le rayon d'influence de la souris
-            if (isMouseDown) {
-                DrawCircleLines((int)mouseX, (int)mouseY, mouseRadius,
-                    Fade(YELLOW, 0.5f));
-                DrawCircleV(Vector2{ mouseX, mouseY }, 5.0f, RED);
+            if (mouseMode >= 0) {
+                int radius = mouseRadius.load(std::memory_order_relaxed);
+                Color circleColor;
+
+                switch (mouseMode) {
+                case 0: // Survol : Jaune
+                    circleColor = Fade(YELLOW, 0.3f);
+                    break;
+                case 1: // Attraction : Vert
+                    circleColor = Fade(GREEN, 0.4f);
+                    break;
+                case 2: // Explosion : Rouge
+                    circleColor = Fade(RED, 0.5f);
+                    break;
+                }
+
+                DrawCircleLines((int)mouseX, (int)mouseY, radius, circleColor);
+                DrawCircleV(Vector2{ mouseX, mouseY }, 5.0f, circleColor);
             }
 
 #ifdef USE_CUDA
@@ -443,8 +502,17 @@ void RaylibView::startRaylibThread() {
                 10, 10, 20, DARKGRAY);
 #endif
 			// Infos souris et force DEBUG
-            DrawText(TextFormat("Mouse: (%.0f, %.0f)", mouseX, mouseY), 10, 70, 20, BLUE);
-            DrawText(TextFormat("Force: (%.1f, %.1f)", forceX, forceY), 10, 95, 20, BLUE);
+            //DrawText(TextFormat("Mouse: (%.0f, %.0f)", mouseX, mouseY), 10, 70, 20, BLUE);
+            //DrawText(TextFormat("Force: (%.1f, %.1f)", forceX, forceY), 10, 95, 20, BLUE);
+            if (mouseMode >= 0) {
+                const char* modeText = "";
+                switch (mouseMode) {
+                case 0: modeText = "POUSSE"; break;
+                case 1: modeText = "ATTIRE"; break;
+                case 2: modeText = "EXPLOSION"; break;
+                }
+                DrawText(modeText, 10, 70, 20, BLUE);
+            }
 
             // =====================
             // 3) OVERLAY "PAUSE"
@@ -501,7 +569,6 @@ void RaylibView::startRaylibThread() {
                 lastFps.store(1.0f / dt, std::memory_order_relaxed);
             }
             lastParticleCount.store((int)particles.size(), std::memory_order_relaxed);
-			wasMouseDown = isMouseDown;
         }
 
 #ifdef USE_CUDA
