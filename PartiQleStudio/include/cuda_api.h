@@ -38,16 +38,6 @@ extern "C" void cuda_apply_mouse_force(float mouseX, float mouseY,
     float forceX, float forceY,
     float radius, int count);
 
-// Fonction démo
-extern "C" void cuda_demo_dump(
-    int grid_size,
-    int block_size,
-    int* out_blockdim,   // taille = grid*block
-    int* out_threadIdx,  // taille = grid*block
-    int* out_blockIdx,   // taille = grid*block
-    int* out_globalIdx   // taille = grid*block
-);
-
 #else
 
 inline void cuda_particles_init(int) {}
@@ -59,16 +49,5 @@ inline void cuda_particles_step(float, float, float, float, float, int, int, int
 
 inline void cuda_particles_download(Particle*, int) {}
 inline void cuda_apply_mouse_force(float, float, float, float, float, int) {}
-
-inline void cuda_demo_dump(
-    int /*grid_size*/,
-    int /*block_size*/,
-    int* /*out_blockdim*/,
-    int* /*out_threadIdx*/,
-    int* /*out_blockIdx*/,
-    int* /*out_globalIdx*/
-) {
-    // On ne fait rien : version "no-op"
-}
 
 #endif

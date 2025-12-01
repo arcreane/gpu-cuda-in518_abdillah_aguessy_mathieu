@@ -16,7 +16,6 @@ public:
 
 
 private slots:
-	void on_btnRunCuda_clicked();
 
 	void on_radioCPU_toggled(bool checked);
 	void on_radioGPU_toggled(bool checked);

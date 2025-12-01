@@ -348,8 +348,10 @@ void RaylibView::startRaylibThread() {
         InitWindow(W, H, "PartiQle Studio - Particles");
         SetTargetFPS(60);
 
-        curW.store(W);
-        curH.store(H);
+        int actualW = GetScreenWidth();
+        int actualH = GetScreenHeight();
+        curW.store(actualW);
+        curH.store(actualH);
 
         // 2) Recuperer le handle natif et le transmettre a Qt
         void* native = GetWindowHandle();
@@ -362,15 +364,32 @@ void RaylibView::startRaylibThread() {
         float prevMouseX = 0.0f;
         float prevMouseY = 0.0f;
 
+        int prevW = actualW;
+        int prevH = actualH;
+
         // 3) rendu raylib
         while (running.load() && !WindowShouldClose()) {
-            // handle resize
-            int rw = reqW.load();
-            int rh = reqH.load();
-            if (rw > 0 && rh > 0 && (rw != curW.load() || rh != curH.load())) {
-                SetWindowSize(rw, rh);
-                curW.store(rw);
-                curH.store(rh);
+            actualW = GetScreenWidth();
+            actualH = GetScreenHeight();
+            
+            bool dimensionsChanged = (actualW != prevW || actualH != prevH);
+            if (dimensionsChanged) {
+                curW.store(actualW);
+                curH.store(actualH);
+                prevW = actualW;
+                prevH = actualH;
+
+                // Repositionner les particules qui sortent des nouveaux murs
+                for (auto& part : particles) {
+                    float r = part.radius;
+
+                    // Clamper dans les nouvelles limites
+                    if (part.x < r) part.x = r;
+                    else if (part.x > actualW - r) part.x = actualW - r;
+
+                    if (part.y < r) part.y = r;
+                    else if (part.y > actualH - r) part.y = actualH - r;
+                }
             }
 
             // dt
@@ -459,6 +478,10 @@ void RaylibView::startRaylibThread() {
 
             BeginDrawing();
             ClearBackground(bg);
+
+			// Bordure et taille simulation
+            DrawRectangleLines(0, 0, actualW, actualH, Fade(RED, 0.5f));
+            DrawText(TextFormat("Sim: %dx%d", actualW, actualH), actualW - 150, 10, 20, RED);
 
 			// Dessin des particules
             for (const auto& part : particles) {
