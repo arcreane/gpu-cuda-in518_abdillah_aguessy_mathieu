@@ -39,57 +39,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui.buttonPause->setEnabled(false);
     ui.buttonPause->setText("Pause");
 
+    // Paramètre physique  
+    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
+    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+
+    rlView->setMouseRadius(ui.spinMouseRadius->value());
+    rlView->setMouseForce(static_cast<float>(ui.spinMouseForce->value()));
+
+    if (ui.sliderVmin) {
+        rlView->setVelocityMin(static_cast<float>(ui.sliderVmin->value()));
+    }
+    if (ui.sliderVmax) {
+        rlView->setVelocityMax(static_cast<float>(ui.sliderVmax->value()));
+    }
+
 }
 
 MainWindow::~MainWindow()
 {}
-
-void MainWindow::on_btnRunCuda_clicked()
-{
-#ifdef USE_CUDA
-    // ==========
-    // VERSION AVEC CUDA
-    // ==========
-    const int grid = 3;
-    const int block = 4;
-    const int size = grid * block;
-
-    std::vector<int> vBlockDim(size), vThreadIdx(size), vBlockIdx(size), vGlobalIdx(size);
-
-    // Appel CUDA cf kernel.cu
-    cuda_demo_dump(grid, block,
-        vBlockDim.data(), vThreadIdx.data(),
-        vBlockIdx.data(), vGlobalIdx.data());
-
-    auto toString = [](const std::vector<int>& v, int n = 8) {
-        QStringList parts;
-        const int k = std::min<int>(n, (int)v.size());
-        for (int i = 0; i < k; ++i) parts << QString::number(v[i]);
-        if ((int)v.size() > k) parts << "...";
-        return parts.join(", ");
-        };
-
-    QString msg;
-    msg += "blockDim.x : [" + toString(vBlockDim) + "]\n";
-    msg += "threadIdx  : [" + toString(vThreadIdx) + "]\n";
-    msg += "blockIdx   : [" + toString(vBlockIdx) + "]\n";
-    msg += "globalIdx  : [" + toString(vGlobalIdx) + "]";
-
-    qDebug().noquote() << msg;
-    QMessageBox::information(this, "CUDA dump", msg);
-
-#else
-    // ==========
-    // VERSION SANS CUDA
-    // ==========
-    QMessageBox::warning(
-        this,
-        "CUDA non disponible",
-        "Votre machine ne possède pas CUDA.\n"
-        "Le calcul GPU n'a pas été exécuté."
-    );
-#endif
-}
 
 /* ============ Moteur CPU / GPU ============ */
 void MainWindow::on_radioCPU_toggled(bool checked)
@@ -131,6 +98,8 @@ void MainWindow::on_buttonStart_clicked()
 	ui.spinParticles->setEnabled(false); // désactiver le spinbox pendant la simulation
 	ui.sliderRmax->setEnabled(false);
 	ui.sliderRmin->setEnabled(false);
+    if (ui.sliderVmin) ui.sliderVmin->setEnabled(false);
+    if (ui.sliderVmax) ui.sliderVmax->setEnabled(false);
 }
 
 void MainWindow::on_buttonPause_clicked()
@@ -162,6 +131,8 @@ void MainWindow::on_buttonReset_clicked()
 	ui.spinParticles->setEnabled(true); // réactiver le spinbox après reset
     ui.sliderRmax->setEnabled(true);
     ui.sliderRmin->setEnabled(true);
+    if (ui.sliderVmin) ui.sliderVmin->setEnabled(true);
+    if (ui.sliderVmax) ui.sliderVmax->setEnabled(true);
 }
 
 /* ============ spinParticles → RaylibView ============ */
@@ -169,6 +140,54 @@ void MainWindow::on_spinParticles_valueChanged(int value)
 {
     if (!rlView) return;
     ui.labelParticleCount->setText(QString("Particles: %1").arg(value));
+}
+
+/* ============ spinElasticity → RaylibView ============ */
+void MainWindow::on_spinElasticity_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setElasticity(static_cast<float>(value));
+}
+
+/* ============ spinFriction → RaylibView ============ */
+void MainWindow::on_spinFriction_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setFriction(static_cast<float>(value));
+}
+
+void MainWindow::on_sliderVmin_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setVelocityMin(static_cast<float>(value));
+
+    // Optionnel: afficher la valeur dans un label
+    if (ui.labelVmin) {
+        ui.labelVmin->setText(QString("Vmin: %1").arg(value));
+    }
+}
+
+void MainWindow::on_sliderVmax_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setVelocityMax(static_cast<float>(value));
+
+    // Optionnel: afficher la valeur dans un label
+    if (ui.labelVmax) {
+        ui.labelVmax->setText(QString("Vmax: %1").arg(value));
+    }
+}
+
+void MainWindow::on_spinMouseRadius_valueChanged(int value)
+{
+    if (!rlView) return;
+    rlView->setMouseRadius(value);
+}
+
+void MainWindow::on_spinMouseForce_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setMouseForce(static_cast<float>(value));
 }
 
 /* ============ Mise à jour Stats ============ */
