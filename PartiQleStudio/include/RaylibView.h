@@ -29,6 +29,10 @@ public:
     void setParticleCount(int count); // spinParticles
 	void setElasticity(float e);      // spinElasticity
 	void setFriction(float f);        // spinFriction
+    void setGravity(float gy);
+    void setDamping(float d);
+    void setRadiusMin(float rmin);
+    void setRadiusMax(float rmax);
     void setVelocityMin(float vmin);
     void setVelocityMax(float vmax);
     void setMouseRadius(int radius);
@@ -81,12 +85,13 @@ private:
     std::vector<Particle> particles;
     int   maxParticles = 100000;                // capacité max
 	std::atomic<int> desiredParticles{ 1000 };  // spinParticles
-
-    float gravityY = 0.1f;
-    float damping = 0.999f;
+    std::atomic<float> radiusMin{ 3.0f };       // Rmin par défaut
+    std::atomic<float> radiusMax{ 6.0f };       // Rmax par défaut
 
     std::atomic<float> frictionCoeff{ 0.0f };   // spinFriction
     std::atomic<float> elasticity{ 0.9f };      // spinElasticity
+    std::atomic<float> gravityY{ 0.1f };        // gravité verticale
+    std::atomic<float> damping{ 0.999f };       // damping global (frein)
     std::atomic<float> velocityMin{ -50.0f };   // Vmin
     std::atomic<float> velocityMax{ 50.0f };    // Vmax
 

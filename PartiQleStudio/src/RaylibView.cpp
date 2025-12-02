@@ -53,6 +53,22 @@ void RaylibView::setFriction(float f) {
     frictionCoeff.store(f, std::memory_order_relaxed);
 }
 
+void RaylibView::setGravity(float gy) {
+    gravityY.store(gy, std::memory_order_relaxed);
+}
+
+void RaylibView::setDamping(float d) {
+    damping.store(d, std::memory_order_relaxed);
+}
+
+void RaylibView::setRadiusMin(float rmin) {
+    radiusMin.store(rmin, std::memory_order_relaxed);
+}
+
+void RaylibView::setRadiusMax(float rmax) {
+    radiusMax.store(rmax, std::memory_order_relaxed);
+}
+
 void RaylibView::setVelocityMin(float vmin) {
     velocityMin.store(vmin, std::memory_order_relaxed);
 }
@@ -181,6 +197,10 @@ void RaylibView::initParticlesCPU() {
 
     float vmin = velocityMin.load(std::memory_order_relaxed);
     float vmax = velocityMax.load(std::memory_order_relaxed);
+    float rmin = radiusMin.load(std::memory_order_relaxed);
+    float rmax = radiusMax.load(std::memory_order_relaxed);
+
+    if (rmax < rmin) std::swap(rmin, rmax);
 
     particles.clear();
     particles.reserve(maxParticles);
@@ -188,7 +208,7 @@ void RaylibView::initParticlesCPU() {
     for (int i = 0; i < count; ++i) {
         Particle p;
 
-        p.radius = frand(3.0f, 6.0f);
+        p.radius = frand(rmin,rmax);
 
         // spawn near the top center
         p.x = frand(p.radius, width - p.radius);
@@ -219,7 +239,9 @@ void RaylibView::stepParticlesCPU(float dt) {
 
     // Récupérer paramètres physiques depuis les atomics
     float eps = elasticity.load(std::memory_order_relaxed);     // coefficient d'élasticité
-    float mu = frictionCoeff.load(std::memory_order_relaxed);  // frottement visqueux
+    float mu = frictionCoeff.load(std::memory_order_relaxed);   // frottement visqueux
+	float gy = gravityY.load(std::memory_order_relaxed);        // gravité verticale
+	float baseDamp = damping.load(std::memory_order_relaxed);   // damping global
 
     // bornes raisonnables
     if (eps < 0.0f) eps = 0.0f;
@@ -227,7 +249,7 @@ void RaylibView::stepParticlesCPU(float dt) {
     if (mu < 0.0f) mu = 0.0f;
 
     // Damping effectif par frame (base * frottement)
-    float perStepDamp = damping * (1.0f - mu * dt);
+    float perStepDamp = baseDamp * (1.0f - mu * dt);
     if (perStepDamp < 0.0f) perStepDamp = 0.0f;
     if (perStepDamp > 1.0f) perStepDamp = 1.0f;
 
@@ -237,7 +259,7 @@ void RaylibView::stepParticlesCPU(float dt) {
 	// Integration  physique simple (gravite, frottement, collisions mur)
     for (auto& p : particles) {
         // gravité
-        p.vy += gravityY * dt;
+        p.vy += gy * dt;
 
         // frottement global
         p.vx *= perStepDamp;
@@ -349,9 +371,11 @@ void RaylibView::stepParticlesGPU(float dt) {
     // Récupération des paramètres physiques
     float eps = elasticity.load(std::memory_order_relaxed);
     float mu = frictionCoeff.load(std::memory_order_relaxed);
+    float gy = gravityY.load(std::memory_order_relaxed);
+    float baseDamp = damping.load(std::memory_order_relaxed);
 
     // physics on GPU
-    cuda_particles_step(dt, gravityY, damping, eps, mu, width, height, count);
+    cuda_particles_step(dt, gy, baseDamp, eps, mu, width, height, count);
 
     // device -> host
     cuda_particles_download(particles.data(), count);
@@ -426,8 +450,10 @@ void RaylibView::startRaylibThread() {
 
             // dt
             auto now = clock::now();
-            float dt = std::chrono::duration<float>(now - lastTime).count();
+            float dtReal = std::chrono::duration<float>(now - lastTime).count();
             lastTime = now;
+
+            float dt = dtReal;
             if (dt > 0.05f) dt = 0.05f; // clamp
 
             bool isPaused = paused.load(std::memory_order_relaxed);
@@ -477,9 +503,18 @@ void RaylibView::startRaylibThread() {
 
                     // Appliquer la force de la souris (GPU)
                     if (mouseMode >= 0) {
-                        cuda_particles_download(particles.data(), particles.size());
-                        applyMouseForceCPU(mouseX, mouseY, mouseVelX, mouseVelY, mouseMode);
-                        cuda_particles_upload(particles.data(), particles.size());
+                        float radius = (float)mouseRadius.load(std::memory_order_relaxed);
+                        float forceScale = mouseForceScale.load(std::memory_order_relaxed);
+                        int   count = (int)particles.size();
+
+                        cuda_apply_mouse_force(
+                            mouseX, mouseY,
+                            mouseVelX, mouseVelY,
+                            radius,
+                            forceScale,
+                            mouseMode,
+                            count
+                        );
                     }
                 }
                 else {
@@ -643,9 +678,9 @@ void RaylibView::startRaylibThread() {
             // =====================
             // 4) STATS POUR Qt
             // =====================
-            if (dt > 0.0f) {
-                lastFrameMs.store(dt * 1000.0f, std::memory_order_relaxed);
-                lastFps.store(1.0f / dt, std::memory_order_relaxed);
+            if (dtReal > 0.0f) {
+                lastFrameMs.store(dtReal * 1000.0f, std::memory_order_relaxed);
+                lastFps.store(1.0f / dtReal, std::memory_order_relaxed);
             }
             lastParticleCount.store((int)particles.size(), std::memory_order_relaxed);
         }
