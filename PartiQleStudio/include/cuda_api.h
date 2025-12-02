@@ -35,8 +35,11 @@ extern "C" void cuda_particles_download(Particle* hostParticles, int count);
 
 // Applique une force aux particules autour de la souris (GPU)
 extern "C" void cuda_apply_mouse_force(float mouseX, float mouseY,
-    float forceX, float forceY,
-    float radius, int count);
+    float velX, float velY,
+    float radius,
+    float forceScale,
+    int   mode,
+    int   count);
 
 #else
 
@@ -48,6 +51,6 @@ inline void cuda_particles_upload(const Particle*, int) {}
 inline void cuda_particles_step(float, float, float, float, float, int, int, int) {}
 
 inline void cuda_particles_download(Particle*, int) {}
-inline void cuda_apply_mouse_force(float, float, float, float, float, int) {}
+inline void cuda_apply_mouse_force(float, float, float, float, float, float, int, int) {}
 
 #endif

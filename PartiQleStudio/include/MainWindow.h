@@ -27,8 +27,12 @@ private slots:
 	void on_spinParticles_valueChanged(int value);
 	void on_spinElasticity_valueChanged(double value);
 	void on_spinFriction_valueChanged(double value);
+	void on_sliderRmin_valueChanged(int value);
+	void on_sliderRmax_valueChanged(int value);
 	void on_sliderVmin_valueChanged(int value);
 	void on_sliderVmax_valueChanged(int value);
+	void on_spinGravity_valueChanged(double value);
+	void on_spinDamping_valueChanged(double value);
 
 	void on_spinMouseRadius_valueChanged(int value);
 	void on_spinMouseForce_valueChanged(double value);
