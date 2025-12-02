@@ -190,6 +190,25 @@ void MainWindow::on_spinMouseForce_valueChanged(double value)
     rlView->setMouseForce(static_cast<float>(value));
 }
 
+/* ============ Debug Overlays ============ */
+void MainWindow::on_actionShowMouseInfo_toggled(bool checked)
+{
+    if (!rlView) return;
+    rlView->setShowMouseInfo(checked);
+}
+
+void MainWindow::on_actionShowEngineInfo_toggled(bool checked)
+{
+    if (!rlView) return;
+    rlView->setShowEngineInfo(checked);
+}
+
+void MainWindow::on_actionShowPerfInfo_toggled(bool checked)
+{
+    if (!rlView) return;
+    rlView->setShowPerfInfo(checked);
+}
+
 /* ============ Mise à jour Stats ============ */
 void MainWindow::updateStats()
 {

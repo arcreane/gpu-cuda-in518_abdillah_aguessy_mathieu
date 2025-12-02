@@ -69,6 +69,30 @@ void RaylibView::setMouseForce(float force) {
     mouseForceScale.store(force, std::memory_order_relaxed);
 }
 
+void RaylibView::setShowMouseInfo(bool v) {
+    showMouseInfo.store(v, std::memory_order_relaxed);
+}
+
+void RaylibView::setShowEngineInfo(bool v) {
+    showEngineInfo.store(v, std::memory_order_relaxed);
+}
+
+void RaylibView::setShowPerfInfo(bool v) {
+    showPerfInfo.store(v, std::memory_order_relaxed);
+}
+
+bool RaylibView::isShowMouseInfo() const {
+    return showMouseInfo.load(std::memory_order_relaxed);
+}
+
+bool RaylibView::isShowEngineInfo() const {
+    return showEngineInfo.load(std::memory_order_relaxed);
+}
+
+bool RaylibView::isShowPerfInfo() const {
+    return showPerfInfo.load(std::memory_order_relaxed);
+}
+
 void RaylibView::applyMouseForceCPU(float mouseX, float mouseY, float velX, float velY, int mode) {
     float radius = static_cast<float>(mouseRadius.load(std::memory_order_relaxed));
     float forceScale = mouseForceScale.load(std::memory_order_relaxed);
@@ -510,31 +534,53 @@ void RaylibView::startRaylibThread() {
                 DrawCircleV(Vector2{ mouseX, mouseY }, 5.0f, circleColor);
             }
 
+            // =====================
+            // INFOS MOTEUR (DEBUG)
+            // =====================
+            if (showEngineInfo.load(std::memory_order_relaxed)) {
 #ifdef USE_CUDA
-            const char* mode = useGPU.load(std::memory_order_relaxed) ? "GPU" : "CPU";
-            DrawText(TextFormat("Mode: %s", mode),
-                10, 10, 20, GREEN);
-            if (useGPU.load())
-                DrawText("GPU ACTIVE", 10, 40, 20, GREEN);
-            else
-                DrawText("CPU ACTIVE", 10, 40, 20, RED);
+                const char* mode = useGPU.load(std::memory_order_relaxed) ? "GPU" : "CPU";
+                DrawText(TextFormat("Mode: %s", mode),
+                    10, 10, 20, GREEN);
+                if (useGPU.load())
+                    DrawText("GPU ACTIVE", 10, 40, 20, GREEN);
+                else
+                    DrawText("CPU ACTIVE", 10, 40, 20, RED);
 
 #else
-            // Exemple minimal de drawing (remarque : DrawText utilise la police par defaut)
-            DrawText("Mode: CPU (CUDA not available)",
-                10, 10, 20, DARKGRAY);
+                // Exemple minimal de drawing (remarque : DrawText utilise la police par defaut)
+                DrawText("Mode: CPU (CUDA not available)",
+                    10, 10, 20, DARKGRAY);
 #endif
-			// Infos souris et force DEBUG
-            //DrawText(TextFormat("Mouse: (%.0f, %.0f)", mouseX, mouseY), 10, 70, 20, BLUE);
-            //DrawText(TextFormat("Force: (%.1f, %.1f)", forceX, forceY), 10, 95, 20, BLUE);
-            if (mouseMode >= 0) {
-                const char* modeText = "";
-                switch (mouseMode) {
-                case 0: modeText = "POUSSE"; break;
-                case 1: modeText = "ATTIRE"; break;
-                case 2: modeText = "EXPLOSION"; break;
+            }
+
+            // =====================
+            // INFOS SOURIS (DEBUG)
+            // =====================
+            if (showMouseInfo.load(std::memory_order_relaxed)) {
+                // Afficher position souris
+                DrawText(TextFormat("Mouse: (%.0f, %.0f)", mouseX, mouseY), 10, 70, 20, BLUE);
+                
+                // Afficher mode souris
+                if (mouseMode >= 0) {
+                    const char* modeText = "";
+                    switch (mouseMode) {
+                    case 0: modeText = "POUSSE"; break;
+                    case 1: modeText = "ATTIRE"; break;
+                    case 2: modeText = "EXPLOSION"; break;
+                    }
+                    DrawText(modeText, 10, 95, 20, BLUE);
                 }
-                DrawText(modeText, 10, 70, 20, BLUE);
+            }
+
+            // =====================
+            // INFOS PERFORMANCE (DEBUG)
+            // =====================
+            if (showPerfInfo.load(std::memory_order_relaxed)) {
+                float currentFps = lastFps.load(std::memory_order_relaxed);
+                float currentFrameMs = lastFrameMs.load(std::memory_order_relaxed);
+                DrawText(TextFormat("FPS: %.1f (%.2f ms)", currentFps, currentFrameMs),
+                    10, 120, 20, ORANGE);
             }
 
             // =====================
@@ -647,5 +693,8 @@ void RaylibView::embedHandleToQt(void* nativeHandle) {
         setLayout(l);
     }
 }
+
+
+
 
 
