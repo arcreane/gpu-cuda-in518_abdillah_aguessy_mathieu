@@ -191,28 +191,77 @@ void MainWindow::on_spinMouseForce_valueChanged(double value)
 }
 
 /* ============ Debug Overlays ============ */
+void MainWindow::on_actionShowAllInfos_toggled(bool checked)
+{
+    if (!rlView) return;
+
+    // Bloquer les signaux pour éviter les boucles infinies
+    ui.actionShowMouseInfo->blockSignals(true);
+    ui.actionShowEngineInfo->blockSignals(true);
+    ui.actionShowPerfInfo->blockSignals(true);
+    ui.actionShowBoxsimInfo->blockSignals(true);
+
+    // Synchroniser toutes les actions
+    ui.actionShowMouseInfo->setChecked(checked);
+    ui.actionShowEngineInfo->setChecked(checked);
+    ui.actionShowPerfInfo->setChecked(checked);
+    ui.actionShowBoxsimInfo->setChecked(checked);
+
+    // Débloquer les signaux
+    ui.actionShowMouseInfo->blockSignals(false);
+    ui.actionShowEngineInfo->blockSignals(false);
+    ui.actionShowPerfInfo->blockSignals(false);
+    ui.actionShowBoxsimInfo->blockSignals(false);
+
+    // Appliquer les changements à RaylibView
+    rlView->setShowMouseInfo(checked);
+    rlView->setShowEngineInfo(checked);
+    rlView->setShowPerfInfo(checked);
+    rlView->setShowBoxsimInfo(checked);
+}
+
 void MainWindow::on_actionShowMouseInfo_toggled(bool checked)
 {
     if (!rlView) return;
     rlView->setShowMouseInfo(checked);
+    if (!checked && ui.actionShowAllInfos->isChecked()) {
+        ui.actionShowAllInfos->blockSignals(true);
+        ui.actionShowAllInfos->setChecked(false);
+        ui.actionShowAllInfos->blockSignals(false);
+    }
 }
 
 void MainWindow::on_actionShowEngineInfo_toggled(bool checked)
 {
     if (!rlView) return;
     rlView->setShowEngineInfo(checked);
+    if (!checked && ui.actionShowAllInfos->isChecked()) {
+        ui.actionShowAllInfos->blockSignals(true);
+        ui.actionShowAllInfos->setChecked(false);
+        ui.actionShowAllInfos->blockSignals(false);
+    }
 }
 
 void MainWindow::on_actionShowPerfInfo_toggled(bool checked)
 {
     if (!rlView) return;
     rlView->setShowPerfInfo(checked);
+    if (!checked && ui.actionShowAllInfos->isChecked()) {
+        ui.actionShowAllInfos->blockSignals(true);
+        ui.actionShowAllInfos->setChecked(false);
+        ui.actionShowAllInfos->blockSignals(false);
+    }
 }
 
 void MainWindow::on_actionShowBoxsimInfo_toggled(bool checked)
 {
 	if (!rlView) return;
 	rlView->setShowBoxsimInfo(checked);
+    if (!checked && ui.actionShowAllInfos->isChecked()) {
+        ui.actionShowAllInfos->blockSignals(true);
+        ui.actionShowAllInfos->setChecked(false);
+        ui.actionShowAllInfos->blockSignals(false);
+    }
 }
 
 /* ============ Mise à jour Stats ============ */

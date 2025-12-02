@@ -404,6 +404,8 @@
      <property name="title">
       <string>Raylib</string>
      </property>
+	 <addaction name="actionShowAllInfos"/>
+	 <addaction name="separator"/>
      <addaction name="actionShowMouseInfo"/>
      <addaction name="actionShowEngineInfo"/>
      <addaction name="actionShowPerfInfo"/>
@@ -429,12 +431,26 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionShowMouseInfo">
+  <action name="actionShowAllInfos">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Afficher toutes les infos</string>
+   </property>
+   <property name="toolTip">
+    <string>Active/désactive tous les overlays de debug</string>
+   </property>
+  </action>
+  <action name="actionShowMouseInfo">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Afficher infos souris</string>
@@ -445,7 +461,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Afficher mode CPU/GPU</string>
@@ -460,6 +476,14 @@
    </property>
    <property name="text">
     <string>Afficher FPS dans Raylib</string>
+   </property>
+  </action>
+  <action name="actionShowBoxsimInfo">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Afficher dimensions fenêtre</string>
    </property>
   </action>
  </widget>

@@ -33,6 +33,7 @@ private slots:
 	void on_spinMouseRadius_valueChanged(int value);
 	void on_spinMouseForce_valueChanged(double value);
 
+	void on_actionShowAllInfos_toggled(bool checked);
 	void on_actionShowMouseInfo_toggled(bool checked);
 	void on_actionShowEngineInfo_toggled(bool checked);
 	void on_actionShowPerfInfo_toggled(bool checked);

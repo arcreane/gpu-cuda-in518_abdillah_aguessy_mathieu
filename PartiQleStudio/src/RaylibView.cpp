@@ -512,7 +512,7 @@ void RaylibView::startRaylibThread() {
             ClearBackground(bg);
 
 			// Bordure et taille simulation
-            if (setShowBoxsimInfo.load(std::memory_order_relaxed)) {
+            if (showBoxsimInfo.load(std::memory_order_relaxed)) {
                 DrawRectangleLines(0, 0, actualW, actualH, Fade(RED, 0.5f));
                 DrawText(TextFormat("Sim: %dx%d", actualW, actualH), actualW - 150, 10, 20, RED);
             }
