@@ -81,6 +81,10 @@ void RaylibView::setShowPerfInfo(bool v) {
     showPerfInfo.store(v, std::memory_order_relaxed);
 }
 
+void RaylibView::setShowBoxsimInfo(bool v) {
+    showBoxsimInfo.store(v, std::memory_order_relaxed);
+}
+
 bool RaylibView::isShowMouseInfo() const {
     return showMouseInfo.load(std::memory_order_relaxed);
 }
@@ -91,6 +95,10 @@ bool RaylibView::isShowEngineInfo() const {
 
 bool RaylibView::isShowPerfInfo() const {
     return showPerfInfo.load(std::memory_order_relaxed);
+}
+
+bool RaylibView::isShowBoxsimInfo() const {
+    return showBoxsimInfo.load(std::memory_order_relaxed);
 }
 
 void RaylibView::applyMouseForceCPU(float mouseX, float mouseY, float velX, float velY, int mode) {
@@ -504,8 +512,10 @@ void RaylibView::startRaylibThread() {
             ClearBackground(bg);
 
 			// Bordure et taille simulation
-            DrawRectangleLines(0, 0, actualW, actualH, Fade(RED, 0.5f));
-            DrawText(TextFormat("Sim: %dx%d", actualW, actualH), actualW - 150, 10, 20, RED);
+            if (setShowBoxsimInfo.load(std::memory_order_relaxed)) {
+                DrawRectangleLines(0, 0, actualW, actualH, Fade(RED, 0.5f));
+                DrawText(TextFormat("Sim: %dx%d", actualW, actualH), actualW - 150, 10, 20, RED);
+            }
 
 			// Dessin des particules
             for (const auto& part : particles) {

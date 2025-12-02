@@ -407,6 +407,7 @@
      <addaction name="actionShowMouseInfo"/>
      <addaction name="actionShowEngineInfo"/>
      <addaction name="actionShowPerfInfo"/>
+     <addaction name="actionShowBoxsimInfo"/>
     </widget>
     <addaction name="menuRaylib"/>
    </widget>

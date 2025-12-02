@@ -38,9 +38,11 @@ public:
     void setShowMouseInfo(bool v);
     void setShowEngineInfo(bool v);
     void setShowPerfInfo(bool v);
+	void setShowBoxsimInfo(bool v);
     bool isShowMouseInfo() const;
     bool isShowEngineInfo() const;
     bool isShowPerfInfo() const;
+	bool isShowBoxsimInfo() const;
 
     // Stats
     float fps() const { return lastFps.load(); }
@@ -95,9 +97,11 @@ private:
     std::atomic<bool> paused{ true };
 
     // Debug overlays flags
-    std::atomic<bool> showMouseInfo{ true };
-    std::atomic<bool> showEngineInfo{ true };
+    std::atomic<bool> showMouseInfo{ false };
+    std::atomic<bool> showEngineInfo{ false };
     std::atomic<bool> showPerfInfo{ false };
+	std::atomic<bool> showBoxsimInfo{ false };
+
 
     // Stats pour le panneau Qt
     std::atomic<float> lastFrameMs{ 0.0f };

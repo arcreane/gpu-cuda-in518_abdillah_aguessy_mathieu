@@ -36,6 +36,7 @@ private slots:
 	void on_actionShowMouseInfo_toggled(bool checked);
 	void on_actionShowEngineInfo_toggled(bool checked);
 	void on_actionShowPerfInfo_toggled(bool checked);
+	void on_actionShowBoxsimInfo_toggled(bool checked);
 
 	void updateStats();
 

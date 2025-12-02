@@ -209,6 +209,12 @@ void MainWindow::on_actionShowPerfInfo_toggled(bool checked)
     rlView->setShowPerfInfo(checked);
 }
 
+void MainWindow::on_actionShowBoxsimInfo_toggled(bool checked)
+{
+	if (!rlView) return;
+	rlView->setShowBoxsimInfo(checked);
+}
+
 /* ============ Mise à jour Stats ============ */
 void MainWindow::updateStats()
 {
