@@ -69,6 +69,10 @@ void RaylibView::setMouseForce(float force) {
     mouseForceScale.store(force, std::memory_order_relaxed);
 }
 
+void RaylibView::setGravity(float gy) {
+    gravityY.store(gy, std::memory_order_relaxed);
+}
+
 void RaylibView::setShowMouseInfo(bool v) {
     showMouseInfo.store(v, std::memory_order_relaxed);
 }
@@ -703,6 +707,10 @@ void RaylibView::embedHandleToQt(void* nativeHandle) {
         setLayout(l);
     }
 }
+
+
+
+
 
 
 

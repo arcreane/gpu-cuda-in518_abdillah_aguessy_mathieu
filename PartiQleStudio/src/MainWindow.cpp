@@ -280,3 +280,51 @@ void MainWindow::updateStats()
     ui.labelMode->setText(QString("Mode: %1").arg(gpu ? "GPU" : "CPU"));
 }
 
+void MainWindow::on_actionPresetTerre_triggered()
+{
+    // Physique “Terre”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(5);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(30);
+    ui.spinElasticity->setValue(0.7);
+    ui.spinFriction->setValue(0.2);
+
+    if (!rlView) return;
+    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 5));
+    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 30));
+    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
+    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+    rlView->setGravity(0.10f); // ~Terre
+}
+
+void MainWindow::on_actionPresetMars_triggered()
+{
+    // Physique “Mars”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(8);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(40);
+    ui.spinElasticity->setValue(0.8);
+    ui.spinFriction->setValue(0.1);
+
+    if (!rlView) return;
+    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 8));
+    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 40));
+    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
+    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+    rlView->setGravity(0.038f); // ~0.38 g Terre
+}
+
+void MainWindow::on_actionPresetVideSpatial_triggered()
+{
+    // Physique “Vide spatial”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(0);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(80);
+    ui.spinElasticity->setValue(0.95);
+    ui.spinFriction->setValue(0.0);
+
+    if (!rlView) return;
+    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 0));
+    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 80));
+    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
+    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+    rlView->setGravity(0.0f); // pas de gravité
+}
+

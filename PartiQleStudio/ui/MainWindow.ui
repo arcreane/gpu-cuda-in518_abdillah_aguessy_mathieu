@@ -417,6 +417,15 @@
     <property name="title">
      <string>Options</string>
     </property>
+    <widget class="QMenu" name="menuPreset">
+     <property name="title">
+      <string>Preset</string>
+     </property>
+     <addaction name="actionPresetTerre"/>
+     <addaction name="actionPresetMars"/>
+     <addaction name="actionPresetVideSpatial"/>
+    </widget>
+    <addaction name="menuPreset"/>
    </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuView"/>
@@ -484,6 +493,21 @@
    </property>
    <property name="text">
     <string>Afficher dimensions fenêtre</string>
+   </property>
+  </action>
+  <action name="actionPresetTerre">
+   <property name="text">
+    <string>Terre</string>
+   </property>
+  </action>
+  <action name="actionPresetMars">
+   <property name="text">
+    <string>Mars</string>
+   </property>
+  </action>
+  <action name="actionPresetVideSpatial">
+   <property name="text">
+    <string>Vide spatial</string>
    </property>
   </action>
  </widget>
