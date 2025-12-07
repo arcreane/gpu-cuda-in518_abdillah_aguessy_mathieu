@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>881</height>
+    <height>924</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,15 +17,24 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QWidget" name="verticalLayoutControl_2" native="true">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
-        <width>250</width>
+        <width>350</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>350</width>
         <height>16777215</height>
        </size>
       </property>
@@ -413,6 +422,37 @@
          </layout>
         </widget>
        </item>
+       <item alignment="Qt::AlignmentFlag::AlignVCenter">
+        <widget class="QGroupBox" name="frameGraphFps">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Graph FPS </string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="FpsGraphWidget" name="fpsGraphWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>80</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
@@ -464,6 +504,9 @@
      <addaction name="actionShowBoxsimInfo"/>
     </widget>
     <addaction name="menuRaylib"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionShowGraph"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -569,8 +612,24 @@
     <string>Reset Paramètre Physique</string>
    </property>
   </action>
+  <action name="actionShowGraph">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Afficher Graph FPS</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>FpsGraphWidget</class>
+   <extends>QWidget</extends>
+   <header>fpsgraphwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <slots>

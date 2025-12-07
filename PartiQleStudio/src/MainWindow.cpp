@@ -12,6 +12,20 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui.setupUi(this);
 
+    // Récupérer le widget promu pour le graphe
+    fpsGraph = qobject_cast<FpsGraphWidget*>(ui.fpsGraphWidget);
+    if (fpsGraph) {
+        fpsGraph->setHistorySize(150);
+    }
+
+    // QFrame caché au démarrage
+    if (ui.frameGraphFps) {
+        ui.frameGraphFps->setVisible(false);
+    }
+    if (ui.actionShowGraph) {
+        ui.actionShowGraph->setChecked(false);
+    }
+
 	rlView = new RaylibView(this); //widget pour Raylib
 	rlView->setMinimumSize(800, 450);
 
@@ -135,6 +149,7 @@ void MainWindow::on_buttonReset_clicked()
     ui.sliderRmin->setEnabled(true);
     if (ui.sliderVmin) ui.sliderVmin->setEnabled(true);
     if (ui.sliderVmax) ui.sliderVmax->setEnabled(true);
+    if (fpsGraph) fpsGraph->reset();
 }
 
 /* ============ spinParticles → RaylibView ============ */
@@ -309,6 +324,13 @@ void MainWindow::on_actionShowBoxsimInfo_toggled(bool checked)
     }
 }
 
+void MainWindow::on_actionShowGraph_toggled(bool checked)
+{
+    if (ui.frameGraphFps){
+        ui.frameGraphFps->setVisible(checked);
+    }
+}
+
 /* ============ Mise à jour Stats ============ */
 void MainWindow::updateStats()
 {
@@ -323,6 +345,13 @@ void MainWindow::updateStats()
     ui.labelFrameTime->setText(QString("Frame time: %1 ms").arg(ms, 0, 'f', 2));
     ui.labelParticleCount->setText(QString("Particles: %1").arg(count));
     ui.labelMode->setText(QString("Mode: %1").arg(gpu ? "GPU" : "CPU"));
+
+    // --- Update du graphe FPS/FrameTime ---
+    if (fpsGraph && ui.frameGraphFps && ui.frameGraphFps->isVisible()) {
+        if (!rlView->isPaused()) {
+            fpsGraph->pushSample(fps, ms);
+        }
+    }
 }
 
 void MainWindow::on_actionPresetTerre_triggered()
