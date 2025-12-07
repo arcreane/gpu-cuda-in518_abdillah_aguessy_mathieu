@@ -243,10 +243,13 @@ extern "C" void cuda_demo_dump(int, int, int*, int*, int*, int*) {}
 // Kernel pour appliquer la force de la souris
 // --------------------------------------------------
 __global__ void kernel_apply_mouse_force(
-    Particle* particles, int count,
+    Particle* particles,
     float mouseX, float mouseY,
-    float forceX, float forceY,
-    float radius)
+    float velX, float velY,
+    float radius,
+    float forceScale,
+    int   mode,
+    int   count)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= count) return;
@@ -258,12 +261,30 @@ __global__ void kernel_apply_mouse_force(
     float distSq = dx * dx + dy * dy;
     float radiusSq = radius * radius;
 
-    if (distSq < radiusSq && distSq > 1e-6f) {
-        float dist = sqrtf(distSq);
-        float influence = 1.0f - (dist / radius); // Décroissance linéaire
+    if (distSq >= radiusSq || distSq <= 1e-6f) return;
 
-        p.vx += forceX * influence;
-        p.vy += forceY * influence;
+    float dist = sqrtf(distSq);
+    float nx = dx / dist;  // normale depuis souris vers particule
+    float ny = dy / dist;
+
+    float influence = 1.0f - (dist / radius); // décroissance linéaire
+
+    if (mode == 0) {
+        // Survol : pousse dans la direction du mouvement
+        p.vx += velX * forceScale * influence;
+        p.vy += velY * forceScale * influence;
+    }
+    else if (mode == 1) {
+        // Clic gauche : attraction vers la souris
+        float attractForce = forceScale * 200.0f * influence;
+        p.vx -= nx * attractForce;
+        p.vy -= ny * attractForce;
+    }
+    else if (mode == 2) {
+        // Clic droit : explosion (repousse)
+        float explosionForce = forceScale * 300.0f * influence;
+        p.vx += nx * explosionForce;
+        p.vy += ny * explosionForce;
     }
 }
 
@@ -272,17 +293,24 @@ __global__ void kernel_apply_mouse_force(
 // --------------------------------------------------
 extern "C" void cuda_apply_mouse_force(
     float mouseX, float mouseY,
-    float forceX, float forceY,
-    float radius, int count)
+    float velX, float velY,
+    float radius,
+    float forceScale,
+    int   mode,
+    int   count)
 {
-    if (!d_particles || count <= 0) return;
+    if (count <= 0 || radius <= 0.0f) return;
 
     int blockSize = 256;
     int gridSize = (count + blockSize - 1) / blockSize;
 
     kernel_apply_mouse_force << <gridSize, blockSize >> > (
-        d_particles, count, mouseX, mouseY, forceX, forceY, radius
+        d_particles,
+        mouseX, mouseY,
+        velX, velY,
+        radius,
+        forceScale,
+        mode,
+        count
         );
-
-    CUDA_CHECK(cudaDeviceSynchronize());
 }

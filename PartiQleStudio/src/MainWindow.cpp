@@ -156,6 +156,46 @@ void MainWindow::on_spinFriction_valueChanged(double value)
     rlView->setFriction(static_cast<float>(value));
 }
 
+/* ============ spinGravity, spinDamping → RaylibView ============ */
+void MainWindow::on_spinGravity_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setGravity(static_cast<float>(value));
+}
+
+void MainWindow::on_spinDamping_valueChanged(double value)
+{
+    if (!rlView) return;
+    rlView->setDamping(static_cast<float>(value));
+}
+
+/* ============ Sliders Rmin, Rmax, Vmin, Vmax → RaylibView ============ */
+void MainWindow::on_sliderRmin_valueChanged(int value)
+{
+    if (!rlView) return;
+
+    float rmin = static_cast<float>(value);
+    rlView->setRadiusMin(rmin);
+
+    // forcer Rmax >= Rmin
+    if (ui.sliderRmax && ui.sliderRmax->value() < value) {
+        ui.sliderRmax->setValue(value);
+    }
+}
+
+void MainWindow::on_sliderRmax_valueChanged(int value)
+{
+    if (!rlView) return;
+
+    float rmax = static_cast<float>(value);
+    rlView->setRadiusMax(rmax);
+
+    // forcer Rmin <= Rmax
+    if (ui.sliderRmin && ui.sliderRmin->value() > value) {
+        ui.sliderRmin->setValue(value);
+    }
+}
+
 void MainWindow::on_sliderVmin_valueChanged(int value)
 {
     if (!rlView) return;
