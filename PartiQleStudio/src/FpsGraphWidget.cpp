@@ -7,7 +7,7 @@
 FpsGraphWidget::FpsGraphWidget(QWidget* parent)
     : QWidget(parent)
 {
-    setMinimumHeight(100);
+    setMinimumHeight(200);
 }
 
 void FpsGraphWidget::setHistorySize(int n)
@@ -57,6 +57,14 @@ float FpsGraphWidget::maxInVector(const QVector<float>& v) const
     return m;
 }
 
+static float avgInVector(const QVector<float>& v)
+{
+    if (v.isEmpty()) return 0.0f;
+    float s = 0.0f;
+    for (float x : v) s += x;
+    return s / v.size();
+}
+
 void FpsGraphWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -73,15 +81,16 @@ void FpsGraphWidget::paintEvent(QPaintEvent* event)
     // Fond
     p.fillRect(rect(), QColor(18, 18, 18));
 
-    const int marginLeft   = 40;
-    const int marginRight  = 10;
-    const int marginTop    = 10;
-    const int marginBottom = 20;
+    const int marginLeft = 5;
+    const int marginRight = 10;
+    const int marginTop = 10;
+    const int legendHeight = 40;     // zone réservée en bas pour le texte
+    const int marginBottom = legendHeight + 5;
 
     QRect drawRect(marginLeft,
-                   marginTop,
-                   w - marginLeft - marginRight,
-                   h - marginTop - marginBottom);
+        marginTop,
+        w - marginLeft - marginRight,
+        h - marginTop - marginBottom);
 
     if (drawRect.width() <= 0 || drawRect.height() <= 0) {
         return;
@@ -98,21 +107,22 @@ void FpsGraphWidget::paintEvent(QPaintEvent* event)
     // Si pas de données, rien à tracer
     int n = m_fpsHistory.size();
     if (n < 2) {
-        // petit texte "no data"
         p.setPen(QColor(160, 160, 160));
-        p.drawText(drawRect, Qt::AlignCenter, "No samples yet");
+        p.drawText(drawRect, Qt::AlignCenter, "Pas de data");
         return;
     }
 
-    // Échelle FPS
+    // Stats
     float maxFps = maxInVector(m_fpsHistory);
-    if (maxFps < 10.0f) maxFps = 10.0f;    // minimum 10 FPS pour l’échelle
+    if (maxFps < 10.0f) maxFps = 10.0f;
 
-    // Échelle FrameTime (ms)
     float maxMs = maxInVector(m_msHistory);
     if (maxMs < 5.0f) maxMs = 5.0f;
 
-    // Construire points (ancien → gauche, récent → droite)
+    float avgFps = avgInVector(m_fpsHistory);
+    float avgMs = avgInVector(m_msHistory);
+
+    // Courbes
     auto buildPolyline = [&](const QVector<float>& data, bool isMs) {
         QVector<QPointF> poly;
         poly.reserve(data.size());
@@ -122,12 +132,7 @@ void FpsGraphWidget::paintEvent(QPaintEvent* event)
             float xRatio = (nb <= 1) ? 0.0f : (float)i / (float)(nb - 1);
             float value = data[i];
 
-            float norm = 0.0f;
-            if (isMs) {
-                norm = value / maxMs;
-            } else {
-                norm = value / maxFps;
-            }
+            float norm = isMs ? value / maxMs : value / maxFps;
             if (norm > 1.0f) norm = 1.0f;
             if (norm < 0.0f) norm = 0.0f;
 
@@ -136,10 +141,10 @@ void FpsGraphWidget::paintEvent(QPaintEvent* event)
             poly.push_back(QPointF(x, y));
         }
         return poly;
-    };
+        };
 
     auto lineFps = buildPolyline(m_fpsHistory, false);
-    auto lineMs  = buildPolyline(m_msHistory, true);
+    auto lineMs = buildPolyline(m_msHistory, true);
 
     // Tracer FPS (vert)
     p.setPen(QPen(QColor(0, 220, 0), 2));
@@ -149,23 +154,35 @@ void FpsGraphWidget::paintEvent(QPaintEvent* event)
     p.setPen(QPen(QColor(255, 160, 0), 2));
     p.drawPolyline(lineMs.constData(), lineMs.size());
 
-    // Légende
-    p.setPen(Qt::white);
-    p.drawText(marginLeft, marginTop - 2, QString("FPS (max ~ %1)").arg(maxFps, 0, 'f', 1));
-    p.drawText(marginLeft, h - 4, QString("Frame time (max ~ %1 ms)").arg(maxMs, 0, 'f', 1));
+    // === Zone légende + stats, SOUS le graphe ===
+    int legendTop = drawRect.bottom() + 3;
 
-    // Mini légende couleur
-    int legendY = marginTop + 15;
+    // Carré FPS
     p.setPen(Qt::NoPen);
     p.setBrush(QColor(0, 220, 0));
-    p.drawRect(marginLeft, legendY, 10, 3);
-    p.setPen(Qt::white);
-    p.drawText(marginLeft + 15, legendY + 5, "FPS");
+    p.drawRect(marginLeft, legendTop + 2, 12, 4);
 
-    legendY += 15;
-    p.setPen(Qt::NoPen);
+    // Carré FrameTime
     p.setBrush(QColor(255, 160, 0));
-    p.drawRect(marginLeft, legendY, 10, 3);
+    p.drawRect(marginLeft, legendTop + 18, 12, 4);
+
+    // Texte condensé sur 2 lignes
     p.setPen(Qt::white);
-    p.drawText(marginLeft + 15, legendY + 5, "Frame time (ms)");
+
+    QString legendText =
+        QString("FPS       max ~ %1  /  avg ~ %2\n"
+            "Frame ms  max ~ %3 ms  /  avg ~ %4 ms")
+        .arg(maxFps, 0, 'f', 1)
+        .arg(avgFps, 0, 'f', 1)
+        .arg(maxMs, 0, 'f', 1)
+        .arg(avgMs, 0, 'f', 1);
+
+    QRect legendRect(marginLeft + 20,
+        legendTop,
+        w - marginLeft - marginRight - 20,
+        h - legendTop - 2);
+
+    p.drawText(legendRect,
+        Qt::AlignLeft | Qt::AlignTop,
+        legendText);
 }

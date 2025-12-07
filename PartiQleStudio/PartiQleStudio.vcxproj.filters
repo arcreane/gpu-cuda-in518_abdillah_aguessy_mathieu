@@ -10,12 +10,18 @@
     <ClCompile Include="src\RaylibView.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\FpsGraphWidget.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\MainWindow.h">
       <Filter>include</Filter>
     </QtMoc>
     <QtMoc Include="include\RaylibView.h">
+      <Filter>include</Filter>
+    </QtMoc>
+    <QtMoc Include="include\FpsGraphWidget.h">
       <Filter>include</Filter>
     </QtMoc>
   </ItemGroup>

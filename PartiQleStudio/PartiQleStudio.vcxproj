@@ -161,10 +161,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\cuda_api.h" />
+    <QtMoc Include="include\FpsGraphWidget.h" />
     <QtMoc Include="include\RaylibView.h" />
     <QtMoc Include="include\MainWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\FpsGraphWidget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
     <ClCompile Include="src\RaylibView.cpp" />
