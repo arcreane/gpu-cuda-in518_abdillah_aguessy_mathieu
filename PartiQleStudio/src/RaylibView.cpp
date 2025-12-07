@@ -53,10 +53,6 @@ void RaylibView::setFriction(float f) {
     frictionCoeff.store(f, std::memory_order_relaxed);
 }
 
-void RaylibView::setGravity(float gy) {
-    gravityY.store(gy, std::memory_order_relaxed);
-}
-
 void RaylibView::setDamping(float d) {
     damping.store(d, std::memory_order_relaxed);
 }
@@ -83,6 +79,10 @@ void RaylibView::setMouseRadius(int radius) {
 
 void RaylibView::setMouseForce(float force) {
     mouseForceScale.store(force, std::memory_order_relaxed);
+}
+
+void RaylibView::setGravity(float gy) {
+    gravityY.store(gy, std::memory_order_relaxed);
 }
 
 void RaylibView::setShowMouseInfo(bool v) {
@@ -738,6 +738,10 @@ void RaylibView::embedHandleToQt(void* nativeHandle) {
         setLayout(l);
     }
 }
+
+
+
+
 
 
 

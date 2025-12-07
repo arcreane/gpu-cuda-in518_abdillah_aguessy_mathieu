@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Paramètre physique  
     rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
     rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+    rlView->setGravity(static_cast<float>(ui.spinGravity->value()));
+	rlView->setDamping(static_cast<float>(ui.spinDamping->value()));
 
     rlView->setMouseRadius(ui.spinMouseRadius->value());
     rlView->setMouseForce(static_cast<float>(ui.spinMouseForce->value()));
@@ -181,6 +183,9 @@ void MainWindow::on_sliderRmin_valueChanged(int value)
     if (ui.sliderRmax && ui.sliderRmax->value() < value) {
         ui.sliderRmax->setValue(value);
     }
+
+    // afficher la valeur dans un label
+    ui.labelRmin->setText(QString("R min: %1").arg(value));
 }
 
 void MainWindow::on_sliderRmax_valueChanged(int value)
@@ -194,17 +199,18 @@ void MainWindow::on_sliderRmax_valueChanged(int value)
     if (ui.sliderRmin && ui.sliderRmin->value() > value) {
         ui.sliderRmin->setValue(value);
     }
+
+    // afficher la valeur dans un label
+    ui.labelRmax->setText(QString("R max: %1").arg(value));
 }
 
 void MainWindow::on_sliderVmin_valueChanged(int value)
 {
     if (!rlView) return;
     rlView->setVelocityMin(static_cast<float>(value));
-
-    // Optionnel: afficher la valeur dans un label
-    if (ui.labelVmin) {
-        ui.labelVmin->setText(QString("Vmin: %1").arg(value));
-    }
+    
+    // afficher la valeur dans un label
+    ui.labelVmin->setText(QString("V min: %1").arg(value));
 }
 
 void MainWindow::on_sliderVmax_valueChanged(int value)
@@ -212,10 +218,9 @@ void MainWindow::on_sliderVmax_valueChanged(int value)
     if (!rlView) return;
     rlView->setVelocityMax(static_cast<float>(value));
 
-    // Optionnel: afficher la valeur dans un label
-    if (ui.labelVmax) {
-        ui.labelVmax->setText(QString("Vmax: %1").arg(value));
-    }
+    // afficher la valeur dans un label
+    ui.labelVmax->setText(QString("V max: %1").arg(value));
+
 }
 
 void MainWindow::on_spinMouseRadius_valueChanged(int value)
@@ -320,3 +325,46 @@ void MainWindow::updateStats()
     ui.labelMode->setText(QString("Mode: %1").arg(gpu ? "GPU" : "CPU"));
 }
 
+void MainWindow::on_actionPresetTerre_triggered()
+{
+    // Physique “Terre”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(5);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(30);
+    ui.spinElasticity->setValue(0.85);
+    ui.spinFriction->setValue(0.3);
+	ui.spinDamping->setValue(0.995);
+    ui.spinGravity->setValue(120);
+}
+
+void MainWindow::on_actionPresetMars_triggered()
+{
+    // Physique “Mars”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(8);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(40);
+    ui.spinElasticity->setValue(0.8);
+    ui.spinFriction->setValue(0.1);
+    ui.spinDamping->setValue(0.995);
+    ui.spinGravity->setValue(60);
+}
+
+void MainWindow::on_actionPresetVideSpatial_triggered()
+{
+    // Physique “Vide spatial”
+    if (ui.sliderVmin) ui.sliderVmin->setValue(0);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(80);
+    ui.spinElasticity->setValue(0.95);
+    ui.spinFriction->setValue(0.0);
+    ui.spinDamping->setValue(0.999);
+    ui.spinGravity->setValue(0);
+}
+
+void MainWindow::on_actionReset_Param_Physique_triggered()
+{
+    // Paramètres par défaut
+    if (ui.sliderVmin) ui.sliderVmin->setValue(20);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(20);
+    ui.spinElasticity->setValue(0.80);
+    ui.spinFriction->setValue(0.20);
+    ui.spinDamping->setValue(0.999);
+    ui.spinGravity->setValue(0);
+}
