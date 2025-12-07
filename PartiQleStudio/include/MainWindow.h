@@ -46,6 +46,7 @@ private slots:
 	void on_actionPresetTerre_triggered();
 	void on_actionPresetMars_triggered();
 	void on_actionPresetVideSpatial_triggered();
+	void on_actionReset_Param_Physique_triggered();
 
 	void updateStats();
 

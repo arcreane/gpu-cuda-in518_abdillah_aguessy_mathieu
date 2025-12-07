@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Paramètre physique  
     rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
     rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
+    rlView->setGravity(static_cast<float>(ui.spinGravity->value()));
+	rlView->setDamping(static_cast<float>(ui.spinDamping->value()));
 
     rlView->setMouseRadius(ui.spinMouseRadius->value());
     rlView->setMouseForce(static_cast<float>(ui.spinMouseForce->value()));
@@ -181,6 +183,9 @@ void MainWindow::on_sliderRmin_valueChanged(int value)
     if (ui.sliderRmax && ui.sliderRmax->value() < value) {
         ui.sliderRmax->setValue(value);
     }
+
+    // afficher la valeur dans un label
+    ui.labelRmin->setText(QString("R min: %1").arg(value));
 }
 
 void MainWindow::on_sliderRmax_valueChanged(int value)
@@ -194,17 +199,18 @@ void MainWindow::on_sliderRmax_valueChanged(int value)
     if (ui.sliderRmin && ui.sliderRmin->value() > value) {
         ui.sliderRmin->setValue(value);
     }
+
+    // afficher la valeur dans un label
+    ui.labelRmax->setText(QString("R max: %1").arg(value));
 }
 
 void MainWindow::on_sliderVmin_valueChanged(int value)
 {
     if (!rlView) return;
     rlView->setVelocityMin(static_cast<float>(value));
-
-    // Optionnel: afficher la valeur dans un label
-    if (ui.labelVmin) {
-        ui.labelVmin->setText(QString("Vmin: %1").arg(value));
-    }
+    
+    // afficher la valeur dans un label
+    ui.labelVmin->setText(QString("V min: %1").arg(value));
 }
 
 void MainWindow::on_sliderVmax_valueChanged(int value)
@@ -212,10 +218,9 @@ void MainWindow::on_sliderVmax_valueChanged(int value)
     if (!rlView) return;
     rlView->setVelocityMax(static_cast<float>(value));
 
-    // Optionnel: afficher la valeur dans un label
-    if (ui.labelVmax) {
-        ui.labelVmax->setText(QString("Vmax: %1").arg(value));
-    }
+    // afficher la valeur dans un label
+    ui.labelVmax->setText(QString("V max: %1").arg(value));
+
 }
 
 void MainWindow::on_spinMouseRadius_valueChanged(int value)
@@ -325,15 +330,10 @@ void MainWindow::on_actionPresetTerre_triggered()
     // Physique “Terre”
     if (ui.sliderVmin) ui.sliderVmin->setValue(5);
     if (ui.sliderVmax) ui.sliderVmax->setValue(30);
-    ui.spinElasticity->setValue(0.7);
-    ui.spinFriction->setValue(0.2);
-
-    if (!rlView) return;
-    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 5));
-    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 30));
-    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
-    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
-    rlView->setGravity(0.10f); // ~Terre
+    ui.spinElasticity->setValue(0.85);
+    ui.spinFriction->setValue(0.3);
+	ui.spinDamping->setValue(0.995);
+    ui.spinGravity->setValue(120);
 }
 
 void MainWindow::on_actionPresetMars_triggered()
@@ -343,13 +343,8 @@ void MainWindow::on_actionPresetMars_triggered()
     if (ui.sliderVmax) ui.sliderVmax->setValue(40);
     ui.spinElasticity->setValue(0.8);
     ui.spinFriction->setValue(0.1);
-
-    if (!rlView) return;
-    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 8));
-    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 40));
-    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
-    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
-    rlView->setGravity(0.038f); // ~0.38 g Terre
+    ui.spinDamping->setValue(0.995);
+    ui.spinGravity->setValue(60);
 }
 
 void MainWindow::on_actionPresetVideSpatial_triggered()
@@ -359,12 +354,17 @@ void MainWindow::on_actionPresetVideSpatial_triggered()
     if (ui.sliderVmax) ui.sliderVmax->setValue(80);
     ui.spinElasticity->setValue(0.95);
     ui.spinFriction->setValue(0.0);
-
-    if (!rlView) return;
-    rlView->setVelocityMin(static_cast<float>(ui.sliderVmin ? ui.sliderVmin->value() : 0));
-    rlView->setVelocityMax(static_cast<float>(ui.sliderVmax ? ui.sliderVmax->value() : 80));
-    rlView->setElasticity(static_cast<float>(ui.spinElasticity->value()));
-    rlView->setFriction(static_cast<float>(ui.spinFriction->value()));
-    rlView->setGravity(0.0f); // pas de gravité
+    ui.spinDamping->setValue(0.999);
+    ui.spinGravity->setValue(0);
 }
 
+void MainWindow::on_actionReset_Param_Physique_triggered()
+{
+    // Paramètres par défaut
+    if (ui.sliderVmin) ui.sliderVmin->setValue(20);
+    if (ui.sliderVmax) ui.sliderVmax->setValue(20);
+    ui.spinElasticity->setValue(0.80);
+    ui.spinFriction->setValue(0.20);
+    ui.spinDamping->setValue(0.999);
+    ui.spinGravity->setValue(0);
+}

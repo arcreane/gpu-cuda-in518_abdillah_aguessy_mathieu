@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>841</height>
+    <height>881</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -219,7 +219,7 @@
              <double>0.001000000000000</double>
             </property>
             <property name="value">
-             <double>0.995000000000000</double>
+             <double>0.999000000000000</double>
             </property>
            </widget>
           </item>
@@ -476,6 +476,8 @@
      <addaction name="actionPresetTerre"/>
      <addaction name="actionPresetMars"/>
      <addaction name="actionPresetVideSpatial"/>
+     <addaction name="separator"/>
+     <addaction name="actionReset_Param_Physique"/>
     </widget>
     <addaction name="menuPreset"/>
    </widget>
@@ -560,6 +562,11 @@
   <action name="actionPresetVideSpatial">
    <property name="text">
     <string>Vide spatial</string>
+   </property>
+  </action>
+  <action name="actionReset_Param_Physique">
+   <property name="text">
+    <string>Reset Paramètre Physique</string>
    </property>
   </action>
  </widget>
