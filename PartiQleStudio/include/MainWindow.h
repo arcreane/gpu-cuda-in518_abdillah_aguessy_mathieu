@@ -3,6 +3,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include "ui_MainWindow.h"
+#include "FpsGraphWidget.h"
 
 class RaylibView;
 
@@ -43,6 +44,8 @@ private slots:
 	void on_actionShowPerfInfo_toggled(bool checked);
 	void on_actionShowBoxsimInfo_toggled(bool checked);
 
+    void on_actionShowGraph_toggled(bool checked);
+
 	void on_actionPresetTerre_triggered();
 	void on_actionPresetMars_triggered();
 	void on_actionPresetVideSpatial_triggered();
@@ -55,5 +58,6 @@ private:
 	RaylibView* rlView = nullptr;
 
 	QTimer* statsTimer = nullptr;
+    FpsGraphWidget* fpsGraph = nullptr;
 };
 

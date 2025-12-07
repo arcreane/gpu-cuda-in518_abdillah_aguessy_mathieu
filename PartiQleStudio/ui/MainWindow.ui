@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>881</height>
+    <height>909</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -414,6 +414,29 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="frameGraphFps">
+         <property name="title">
+          <string>Graph FPS </string>
+         </property>
+         <widget class="QWidget" name="fpsGraphWidget" native="true">
+          <property name="geometry">
+           <rect>
+            <x>60</x>
+            <y>20</y>
+            <width>120</width>
+            <height>120</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>120</height>
+           </size>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
@@ -464,6 +487,9 @@
      <addaction name="actionShowBoxsimInfo"/>
     </widget>
     <addaction name="menuRaylib"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionShowGraph"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -567,6 +593,14 @@
   <action name="actionReset_Param_Physique">
    <property name="text">
     <string>Reset Paramètre Physique</string>
+   </property>
+  </action>
+  <action name="actionShowGraph">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Afficher Graph FPS</string>
    </property>
   </action>
  </widget>
