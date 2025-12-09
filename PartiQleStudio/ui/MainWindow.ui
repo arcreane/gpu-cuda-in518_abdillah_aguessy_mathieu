@@ -77,9 +77,6 @@
           </item>
           <item row="1" column="1">
            <widget class="QSlider" name="sliderRmin">
-            <property name="minimum">
-             <number>0</number>
-            </property>
             <property name="maximum">
              <number>20</number>
             </property>
@@ -100,9 +97,6 @@
           </item>
           <item row="2" column="1">
            <widget class="QSlider" name="sliderRmax">
-            <property name="minimum">
-             <number>0</number>
-            </property>
             <property name="maximum">
              <number>20</number>
             </property>

@@ -191,15 +191,18 @@ void MainWindow::on_sliderRmin_valueChanged(int value)
 {
     if (!rlView) return;
 
+    if (value < 1) {
+        ui.sliderRmin->setValue(1);
+        value = 1;
+    }
+
     float rmin = static_cast<float>(value);
     rlView->setRadiusMin(rmin);
 
-    // forcer Rmax >= Rmin
     if (ui.sliderRmax && ui.sliderRmax->value() < value) {
         ui.sliderRmax->setValue(value);
     }
 
-    // afficher la valeur dans un label
     ui.labelRmin->setText(QString("R min: %1").arg(value));
 }
 
@@ -207,15 +210,18 @@ void MainWindow::on_sliderRmax_valueChanged(int value)
 {
     if (!rlView) return;
 
+    if (value < 1) {
+        ui.sliderRmax->setValue(1);
+        value = 1;
+    }
+
     float rmax = static_cast<float>(value);
     rlView->setRadiusMax(rmax);
 
-    // forcer Rmin <= Rmax
     if (ui.sliderRmin && ui.sliderRmin->value() > value) {
         ui.sliderRmin->setValue(value);
     }
 
-    // afficher la valeur dans un label
     ui.labelRmax->setText(QString("R max: %1").arg(value));
 }
 

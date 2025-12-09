@@ -58,10 +58,12 @@ void RaylibView::setDamping(float d) {
 }
 
 void RaylibView::setRadiusMin(float rmin) {
+    if (rmin < 1.0f) rmin = 1.0f;
     radiusMin.store(rmin, std::memory_order_relaxed);
 }
 
 void RaylibView::setRadiusMax(float rmax) {
+    if (rmax < 1.0f) rmax = 1.0f;
     radiusMax.store(rmax, std::memory_order_relaxed);
 }
 
@@ -199,6 +201,9 @@ void RaylibView::initParticlesCPU() {
     float vmax = velocityMax.load(std::memory_order_relaxed);
     float rmin = radiusMin.load(std::memory_order_relaxed);
     float rmax = radiusMax.load(std::memory_order_relaxed);
+
+    if (rmin < 1.0f) rmin = 1.0f;
+    if (rmax < 1.0f) rmax = 1.0f;
 
     if (rmax < rmin) std::swap(rmin, rmax);
 
