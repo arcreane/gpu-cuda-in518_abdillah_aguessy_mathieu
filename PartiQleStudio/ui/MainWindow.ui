@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>924</height>
+    <height>1012</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -483,11 +483,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFichier">
-    <property name="title">
-     <string>Fichier</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
@@ -524,7 +519,6 @@
     </widget>
     <addaction name="menuPreset"/>
    </widget>
-   <addaction name="menuFichier"/>
    <addaction name="menuView"/>
    <addaction name="menuOptions"/>
   </widget>
