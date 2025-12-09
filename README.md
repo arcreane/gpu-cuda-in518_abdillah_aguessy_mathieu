@@ -118,23 +118,28 @@ Menu **Affichage** :
 
 ## Structure du Projet
 ```css
-PartiQleStudio/
-├── src/
-│   ├── MainWindow.cpp
-│   ├── MainWindow.h
-│   ├── RaylibView.cpp
-│   ├── RaylibView.h
-│   ├── FpsGraphWidget.cpp
-│   ├── FpsGraphWidget.h
-│   └── main.cpp
+├── PartiQleStudio/
+│   ├── src/
+│   │   ├── MainWindow.cpp
+│   │   ├── RaylibView.cpp
+│   │   ├── FpsGraphWidget.cpp
+│   │   └── main.cpp
+│   │
+│   ├── src/
+│   │   ├── MainWindow.h
+│   │   ├── RaylibView.h
+│   │   ├── FpsGraphWidget.h
+│   │   └── cuda_api.h
+│   |
+│   ├── cuda/
+│   │   └── kernel.cu
+│   │
+│   ├── ui/
+│       └── MainWindow.ui
 │
-├── cuda/
-│   ├── kernel.cu
-│   └── cuda_api.h
-│
-├── ui/
-│   └── MainWindow.ui
-│
+├── PartiQleStudio.sln
+├── CMakeLists
+├── .gitignore
 └── README.md
 ```
 
