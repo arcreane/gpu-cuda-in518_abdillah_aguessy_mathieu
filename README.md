@@ -30,7 +30,7 @@ PartiQleStudio est un moteur de simulation physique en temps réel permettant :
 ### Paramètres physiques ajustables
 - Élasticité (0.0 à 1.0)
 - Friction visqueuse (0.0 à 1.0)
-- Gravité (0 à 300)
+- Gravité (-200 à 200)
 - Amortissement global (0.900 à 1.0)
 - Rayon min / max des particules (1 - 20)
 - Vitesse initiale min / max (0 - 100)
