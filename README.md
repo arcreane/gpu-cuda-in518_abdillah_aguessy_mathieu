@@ -25,15 +25,16 @@ PartiQleStudio est un moteur de simulation physique en temps réel permettant :
 - Jusqu'à plusieurs dizaines de milliers de particules
 - Collisions inter-particules + collisions murs
 - Intégration Raylib pour le rendu temps réel
+- Nombre particules maximum : 100000
 
 ### Paramètres physiques ajustables
 - Élasticité (0.0 à 1.0)
 - Friction visqueuse (0.0 à 1.0)
 - Gravité (0 à 300)
-- Amortissement global (0.990 à 1.0)
-- Rayon min / max des particules
-- Vitesse initiale min / max
-- Rayon et force de la souris
+- Amortissement global (0.900 à 1.0)
+- Rayon min / max des particules (1 - 20)
+- Vitesse initiale min / max (0 - 100)
+- Rayon et force de la souris (0 - 100 px) et (0 - 5)
 
 ### Interaction utilisateur
 - Poussée selon mouvement de souris
